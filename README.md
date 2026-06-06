@@ -36,9 +36,7 @@ Si detienes momentáneamente la reproducción, el estado de tu Rich Presence se 
 
 Puedes ver el funcionamiento del instalador interactivo y la sincronización instantánea en el siguiente clip:
 
-[![Ver demostración de Savin-cinema-rpc](https://img.shields.io/badge/YouTube-Ver%20Demostraci%C3%B3n-red?style=for-the-badge&logo=youtube)](https://img.youtube.com/vi/TU_ID_DE_VIDEO/0.jpg)
-> 💡 *Nota:* Si prefieres subir el vídeo directamente al repositorio, puedes arrastrar tu archivo `.mp4` aquí para generar un reproductor HTML5 integrado en GitHub.
-
+[![Ver demostración de Savin-cinema-rpc](https://img.youtube.com/vi/TU_ID_DE_VIDEO/0.jpg)](https://www.youtube.com/watch?v=TU_ID_DE_VIDEO)
 ---
 
 ## 📂 Arquitectura y Rutas por Sistema
