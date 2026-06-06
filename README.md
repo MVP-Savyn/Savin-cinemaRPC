@@ -34,9 +34,9 @@ Si detienes momentáneamente la reproducción, el estado de tu Rich Presence se 
 
 ---
 
-## 📺 Demostración en Vídeo
+## Ve a ver mi vídeo de YT!!
 
-Puedes ver el funcionamiento del instalador interactivo y la sincronización instantánea en el siguiente clip:
+Aquí tienes un pequeño tutorial y demostración del funcionamiento (muy pequeño ya que no tiene mucho misterio):
 
 [![Ver demostración de Savin-cinema-rpc](https://img.youtube.com/vi/TU_ID_DE_VIDEO/0.jpg)](https://www.youtube.com/watch?v=TU_ID_DE_VIDEO)
 ---
