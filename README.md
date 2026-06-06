@@ -8,6 +8,20 @@ Bro simplemente es brutal poder ver en discord la carátula de la película, hay
 
 ---
 
+## 🛠️ DEPENDENCIAS:
+
+### Python 3 (Requisito previo):
+* **🍏 macOS:** `brew install python` o descargar desde la [Web Oficial](https://www.python.org/downloads/mac-osx/)
+* **🐧 Linux (Arch / CachyOS):** `sudo pacman -S python`
+* **🐧 Linux (Ubuntu / Debian):** `sudo apt update && sudo apt install python3 python3-pip`
+* **🪟 Windows:** Descargar desde la [Web Oficial](https://www.python.org/downloads/windows/) *(⚠️ Es crítico marcar la casilla "Add Python to PATH" al instalar)*
+
+### Instalación automática con el programa:
+* **— pypresence —** Permite la comunicación interna con tu cuenta de Discord.
+* **— requests —** Se conecta con la API de TMDB para buscar y descargar las carátulas.
+
+---
+
 ## ✨ Características
 
 * **Soporte Multiplataforma Real**: Adaptado a las particularidades de sockets y tuberías de comunicación de cada sistema operativo (Sockets UNIX en macOS/Linux y Pipes Nombrados en Windows).
@@ -39,6 +53,7 @@ Si detienes momentáneamente la reproducción, el estado de tu Rich Presence se 
 Aquí tienes un pequeño tutorial y demostración del funcionamiento (muy pequeño ya que no tiene mucho misterio):
 
 [![Ver demostración de Savin-cinema-rpc](https://img.youtube.com/vi/TU_ID_DE_VIDEO/0.jpg)](https://www.youtube.com/watch?v=TU_ID_DE_VIDEO)
+
 ---
 
 ## 📂 Arquitectura y Rutas por Sistema
@@ -52,39 +67,6 @@ El programa adapta su comportamiento e inyección de archivos según el entorno 
 | **Windows** 🪟 | `%APPDATA%\mpv\` | `%APPDATA%\mpv\scripts\` | `input-ipc-server=\\.\pipe\mpvsocket` |
 
 ---
-<br>
-<br>
-## 🛠️ Requisitos y Dependencias
-
-Para que el ecosistema de **Savin-cinema-rpc** funcione sin problemas, el único requisito previo es que tu sistema cuente con **Python 3**.
-
-### 1. Instalación de Python 3 (Paso previo manual)
-
-Si tu equipo aún no tiene Python instalado, utiliza el método correspondiente a tu sistema operativo para prepararlo en menos de un minuto:
-
-* **🍏 macOS:**
-  Si utilizas el gestor de paquetes [Homebrew](https://brew.sh/) (altamente recomendado), simplemente ejecuta en tu terminal:
-  ```bash
-  brew install python
-
-    *Alternativa:* También puedes descargar el instalador oficial de paquetes gráficos desde la web de [Python para macOS](https://www.python.org/downloads/mac-osx/).
-
-* **🐧 Linux:**
-  Utiliza el gestor de paquetes nativo de tu distribución:
-  * **Arch Linux / CachyOS:** `sudo pacman -S python`
-  * **Ubuntu / Debian:** `sudo apt update && sudo apt install python3 python3-pip`
-  * **Fedora:** `sudo dnf install python3`
-
-* **🪟 Windows:**
-  Descarga el instalador ejecutable directamente desde [Python para Windows](https://www.python.org/downloads/windows/).
-  > ⚠️ **CRÍTICO PARA WINDOWS:** Al abrir el instalador, asegúrate por completo de marcar la casilla que dice **"Add Python to PATH"** (Añadir Python al PATH) en la parte inferior de la primera ventana antes de pulsar *Install*. Si olvidas este paso, el script `.bat` no reconocerá los comandos.
-
-### 2. Librerías del Núcleo (Instalación 100% Automática)
-
-Una vez que el sistema detecte Python 3, **no necesitas instalar nada más a mano**. Nuestros instaladores automatizados (`.command`, `.sh` o `.bat`) se encargarán de desplegar y actualizar internamente mediante `pip` las siguientes dependencias:
-
-* 📦 **`pypresence`** (vía pip): Una potente librería de bajo nivel escrita en Python que permite una comunicación limpia, asíncrona y segura con las tuberías (pipes) y sockets del cliente nativo de Discord.
-* 📦 **`requests`** (vía pip): El estándar de oro para realizar peticiones HTTP en Python, utilizado por el script para conectarse en tiempo real a la API de **The Movie Database (TMDB)** de forma ultra rápida y segura.
 
 ## 🚀 Guía de Instalación
 
@@ -99,3 +81,21 @@ Una vez que el sistema detecte Python 3, **no necesitas instalar nada más a man
 1. Asegúrate de dar permisos de ejecución al script instalador (`Savin-cinema-rpc.sh`):
    ```bash
    chmod +x Savin-cinema-rpc.sh
+   ```
+2. Ejecútalo desde tu terminal:
+   ```bash
+   ./Savin-cinema-rpc.sh
+   ```
+3. El instalador detectará tu entorno de Python local e inyectará los scripts en tu estructura de `~/.config/mpv/`.
+
+### 🪟 En Windows
+1. Descarga y ejecuta el archivo por lotes `Savin-cinema-rpc.bat`.
+2. El script se encargará de comprobar que Python esté añadido al `PATH` del sistema, instalará las librerías necesarias mediante `pip` de forma silenciosa y generará tanto el disparador Lua como el demonio Python en tu directorio `%APPDATA%\mpv\`.
+
+> 💡 *Optimización para Windows:* El disparador Lua para Windows ejecuta el proceso en segundo plano utilizando `pythonw.exe` para evitar ventanas de comandos parpadeantes o molestas mientras disfrutas de la película.
+
+---
+
+## ⚖️ Licencia
+
+Este proyecto está bajo la Licencia GNU v3. Consulta el archivo `LICENSE` para obtener más detalles.
