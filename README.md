@@ -3,6 +3,8 @@
 Un mod muy simple que envía a discord la información de lo que estás viendo en **local o streaming** con **mpv**, incluyendo la carátula de la película y el minuto de reproducción.
 
 Esta script detecta dinámicamente tu reproducción en mpv, procesa y limpia los nombres de los archivos locales o en streaming (ideal para combinar con **rclone** para usar una nube con películas en remoto) mediante expresiones regulares avanzadas, e interactúa con la API de **The Movie Database (TMDB)** para mostrar el póster oficial y el título estilizado de la película directamente en tu perfil de Discord.
+<br><br>
+Bro simplemente es brutal poder ver en discord la carátula de la película, hay varios mods de mpv pero este aplica una carátula aunque los metadatos de tu archivo **p1r4t4** estén modificados, con tan sólo poner el nombre del archivo con el título de la película (que en la mayor parte de las ocasiones no tendrás que hacerlo porque el mod omite todos los elementos como puntos o enlaces), el mod hace el resto.
 
 ---
 
@@ -23,12 +25,12 @@ Así es como se ve tu perfil de Discord cuando el script está en funcionamiento
 ### 🎬 En Reproducción
 Cuando estás viendo una película, muestra el título limpio, el año de lanzamiento, el estado actual y una barra de tiempo dinámica con el progreso exacto.
 
-![Ejemplo en Reproducción](assets/discord_playing.png) *(Reemplaza esta ruta por tu captura)*
+![Ejemplo en Reproducción](assets/discord_playing.png)
 
 ### ⏸️ En Pausa
 Si detienes momentáneamente la reproducción, el estado de tu Rich Presence se actualiza al instante reflejando que la cinta está pausada y congelando el temporizador.
 
-![Ejemplo en Pausa](assets/discord_paused.png) *(Reemplaza esta ruta por tu captura)*
+![Ejemplo en Pausa](assets/discord_paused.png)
 
 ---
 
