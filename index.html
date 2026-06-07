@@ -126,7 +126,7 @@
             letter-spacing: -0.5px;
         }
 
-        /* --- SISTEMA DE RELEVO HORIZONTAL FLUIDO (ESTILO BATOCERA) --- */
+        /* --- SISTEMA DE RELEVO HORIZONTAL ADAPTATIVO AVANZADO --- */
         .carousel-wrapper {
             position: relative;
             width: 100%;
@@ -154,9 +154,10 @@
             cursor: grabbing;
         }
 
+        /* El contenedor ahora es flexible en anchura y mantiene un alto uniforme */
         .carousel-item {
-            flex: 0 0 320px;
-            aspect-ratio: 16 / 9;
+            flex: 0 0 auto;
+            height: 220px;
             border-radius: 14px;
             background: #101520;
             border: 1px solid #1f2a3c;
@@ -167,22 +168,22 @@
             transform-origin: center center;
         }
 
+        /* Ajuste dinámico inteligente de la imagen */
         .carousel-item img {
-            width: 100%;
             height: 100%;
-            object-fit: cover;
+            width: auto;
+            min-width: 180px;  /* Protege contra imágenes excesivamente verticales */
+            max-width: 400px;  /* Protege contra imágenes panorámicas extremas */
+            object-fit: cover; /* ¡ZOOM e interpolación si choca contra los límites establecidos! */
             pointer-events: none;
-            display: none; /* Se activa mediante JS solo si carga correctamente */
+            display: none;     /* JS se encarga de cambiar a block al verificar la carga */
         }
 
-        /* Fallback elegante oculto por defecto */
+        /* Fallback elástico con tamaño base */
         .carousel-item .img-fallback {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+            width: 320px;
             height: 100%;
-            display: none; /* Se activa mediante JS si la imagen local falla */
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -500,7 +501,7 @@
             margin-bottom: 50px;
         }
 
-        .feature-card {
+        .features-card {
             background: var(--bg-card);
             border: 1px solid #161f2e;
             padding: 25px;
@@ -535,7 +536,7 @@
             <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC/releases/latest" class="cta-btn">Descargar Última Release</a>
         </div>
 
-        <!-- RELEVO HORIZONTAL (ESTILO MENÚ BATOCERA) -->
+        <!-- RELEVO HORIZONTAL (ESTILO MENÚ BATOCERA ADAPTATIVO) -->
         <h2 class="section-title">Galería de Demostración</h2>
         <div class="carousel-wrapper" id="carouselWrapper">
             <div class="carousel-track" id="carouselTrack">
@@ -623,15 +624,15 @@
 
         <!-- Características -->
         <div class="features-grid">
-            <div class="feature-card">
+            <div class="features-card">
                 <h3>🧼 Regex Inteligente</h3>
                 <p>Purga de forma automatizada etiquetas molestas de ripeo o servidores remotos (1080p, x265, Bluray, dual) para búsquedas perfectas.</p>
             </div>
-            <div class="feature-card">
+            <div class="features-card">
                 <h3>🌐 Fallback Bilingüe</h3>
                 <p>Consulta inteligentemente en Español e Inglés en TMDb. Si falta información en un idioma, se complementa al instante.</p>
             </div>
-            <div class="feature-card">
+            <div class="features-card">
                 <h3>🍏 Multiplataforma Real</h3>
                 <p>Mismo rendimiento optimizado y asistentes automatizados integrados para entornos Linux, macOS y Windows.</p>
             </div>
@@ -643,10 +644,12 @@
         </footer>
     </div>
 
-    <!-- SCRIPT DE CORRECCIÓN VISUAL DE FALLBACK E INTERPOLACIÓN -->
+    <!-- SCRIPT DE CÁLCULO DE MÉTRICAS DINÁMICAS ELÁSTICAS -->
     <script>
         const totalImages = 7;
+        const gap = 30;
         const track = document.getElementById('carouselTrack');
+        let singleSetWidth = 0;
 
         function buildCarouselDOM() {
             track.innerHTML = '';
@@ -663,17 +666,17 @@
                     fallback.className = 'img-fallback';
                     fallback.innerHTML = `<span>assets/demo${i}.png</span>Muestra de Rich Presence`;
 
-                    // GESTIÓN DE FLUJO REPARADO:
-                    // Si carga bien, mostramos la imagen y nos aseguramos de que el fallback esté oculto
+                    // LÓGICA DE DETECCIÓN Y REDIMENSIONADO EN TIEMPO REAL:
                     img.onload = function() {
                         this.style.display = 'block';
                         fallback.style.display = 'none';
+                        updateCarouselMetrics();
                     };
 
-                    // Si no existe el archivo png aún, ocultamos la imagen y activamos el cuadro gris informativo
                     img.onerror = function() {
                         this.style.display = 'none';
                         fallback.style.display = 'flex';
+                        updateCarouselMetrics();
                     };
 
                     item.appendChild(img);
@@ -683,15 +686,22 @@
             }
         }
 
+        // Calcula dinámicamente cuánto mide un set completo sumando el ancho real de cada tarjeta
+        function updateCarouselMetrics() {
+            const items = document.querySelectorAll('.carousel-item');
+            let total = 0;
+            for (let i = 0; i < totalImages && i < items.length; i++) {
+                total += items[i].offsetWidth + gap;
+            }
+            singleSetWidth = total;
+        }
+
         buildCarouselDOM();
 
-        /* --- LÓGICA DE CONTROL DINÁMICO DE ZOOM PROGRESIVO --- */
+        /* --- CONTROL DE ZOOM PROGRESIVO ADAPTADO A ANCHOS VARIABLES --- */
         let isDown = false;
         let startX;
         let scrollLeft;
-        const itemWidth = 320; 
-        const gap = 30;        
-        const singleSetWidth = (itemWidth + gap) * totalImages; 
 
         function updateBatoceraAnimation() {
             const trackRect = track.getBoundingClientRect();
@@ -717,7 +727,8 @@
                 item.style.opacity = opacity;
                 item.style.filter = `blur(${blur}px) grayscale(${grayscale}%)`;
                 
-                if (distanceFromCenter < (itemWidth / 2)) {
+                // Mapeo preciso usando el offsetWidth exacto de este elemento en este instante
+                if (distanceFromCenter < (item.offsetWidth / 2)) {
                     item.classList.add('center-active');
                 } else {
                     item.classList.remove('center-active');
@@ -727,9 +738,10 @@
 
         window.addEventListener('load', () => {
             setTimeout(() => {
+                updateCarouselMetrics();
                 track.scrollLeft = singleSetWidth;
                 updateBatoceraAnimation();
-            }, 60);
+            }, 100);
         });
 
         track.addEventListener('mousedown', (e) => {
@@ -782,6 +794,7 @@
         });
 
         function handleInfiniteLoopBounds() {
+            if (singleSetWidth === 0) return;
             if (track.scrollLeft >= singleSetWidth * 2) {
                 track.scrollLeft -= singleSetWidth;
             } else if (track.scrollLeft <= 0) {
