@@ -85,10 +85,10 @@ El programa adapta su comportamiento e inyección de archivos según el entorn
 
 > 💡 *Nota de macOS:* Si el sistema lo bloquea por seguridad la primera vez, haz clic derecho sobre el archivo y selecciona **Abrir**.
 
-### 🐧 En Linux
-1. Da permisos de ejecución al script instalador (`Savin-cinema-rpc.sh`):
-   ```bash
-   chmod +x Savin-cinema-rpc.sh
+   ### 🐧 En Linux
+   1. Da permisos de ejecución al script instalador (`Savin-cinema-rpc.sh`):
+    ```bash
+    chmod +x Savin-cinema-rpc.sh
 
    ---
 
