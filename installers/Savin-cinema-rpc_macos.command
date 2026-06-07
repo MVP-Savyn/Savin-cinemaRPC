@@ -18,7 +18,8 @@ echo ""
 echo -e "${YELLOW}[1/8] 🔍 Buscando tu entorno de Python real...${NC}"
 REAL_PYTHON=$(python3 -c "import sys; print(sys.executable)")
 
-if [ -z "$REAL_PYTHON" ]; then
+if [ -z "$REAL_PYTHON" ];
+then
     echo -e "${RED}❌ Error: No se ha detectado Python 3 en el sistema.${NC}"
     echo "Presiona Enter para salir..."
     read
@@ -34,7 +35,8 @@ echo -e "Introduce tu ${CYAN}CLIENT_ID personalizado${NC} si tienes uno."
 echo -e "O simplemente presiona ${GREEN}[ENTER]${NC} para usar el ID por defecto (${DEFAULT_CLIENT_ID}):"
 read -p "❯ " USER_INPUT_ID
 
-if [ -z "$USER_INPUT_ID" ]; then
+if [ -z "$USER_INPUT_ID" ];
+then
     FINAL_CLIENT_ID="$DEFAULT_CLIENT_ID"
     echo -e "${GREEN}➡ Aplicado ID por defecto: $FINAL_CLIENT_ID${NC}"
 else
@@ -49,7 +51,8 @@ echo -e "¿Deseas mostrar el botón de información de TMDb en Discord?"
 echo -e "Presiona ${GREEN}[ENTER]${NC} para Sí (Por defecto) o introduce ${RED}n${NC} para No:"
 read -p "❯ " USER_INPUT_INFO
 
-if [[ "$USER_INPUT_INFO" =~ ^[nN]$ ]]; then
+if [[ "$USER_INPUT_INFO" =~ ^[nN]$ ]];
+then
     FINAL_INCLUDE_INFO="False"
     echo -e "${RED}➡ Botón de Información desactivado.${NC}"
 else
@@ -58,18 +61,19 @@ else
 fi
 echo ""
 
-# 4. Selector Opcional del Botón GitHub
-echo -e "${YELLOW}[4/8] 💻 Configuración del botón de GitHub...${NC}"
-echo -e "¿Deseas mostrar el botón hacia tu repositorio de GitHub?"
+# 4. Selector Opcional del Botón Web (Landing Page)
+echo -e "${YELLOW}[4/8] 💻 Configuración del botón de la Landing Page...${NC}"
+echo -e "¿Deseas mostrar el botón personalizado hacia tu Web Oficial?"
 echo -e "Presiona ${GREEN}[ENTER]${NC} para Sí (Por defecto) o introduce ${RED}n${NC} para No:"
 read -p "❯ " USER_INPUT_GH
 
-if [[ "$USER_INPUT_GH" =~ ^[nN]$ ]]; then
+if [[ "$USER_INPUT_GH" =~ ^[nN]$ ]];
+then
     FINAL_INCLUDE_GH="False"
-    echo -e "${RED}➡ Botón de GitHub desactivado.${NC}"
+    echo -e "${RED}➡ Botón Web desactivado.${NC}"
 else
     FINAL_INCLUDE_GH="True"
-    echo -e "${GREEN}➡ Botón de GitHub activado.${NC}"
+    echo -e "${GREEN}➡ Botón Web activado.${NC}"
 fi
 echo ""
 
@@ -100,7 +104,7 @@ import sys
 from pypresence import Presence
 
 CLIENT_ID = 'SAVIN_DYNAMIC_CLIENT_ID'
-GITHUB_URL = 'https://github.com/MVP-Savyn/Savin-cinemaRPC'
+GITHUB_URL = 'https://mvp-savyn.github.io/Savin-cinemaRPC/'
 INCLUDE_INFO = SAVIN_DYNAMIC_INCLUDE_INFO
 INCLUDE_GITHUB = SAVIN_DYNAMIC_INCLUDE_GITHUB
 SOCKET_PATH = '/tmp/mpvsocket'
@@ -271,9 +275,9 @@ def main():
             if INCLUDE_INFO and movie_url:
                 buttons_list.append({"label": "Ver información", "url": movie_url})
             
-            # Botón 2 opcional: GitHub
+            # Botón 2 opcional: Landing Page Oficial
             if INCLUDE_GITHUB:
-                buttons_list.append({"label": "Github", "url": GITHUB_URL})
+                buttons_list.append({"label": "Savin-CinemaRPC", "url": GITHUB_URL})
             
             # Inyectar solo si se ha activado al menos un botón válido
             if buttons_list:
@@ -304,7 +308,7 @@ def main():
                     if ep_info: print(f" 📺 Info Serie:      {ep_info}")
                     print(f" ⚙️  Estado RPC:      {payload['state']}")
                     print(f" 🎬 Botón Info:      {'ACTIVADO' if (INCLUDE_INFO and movie_url) else 'DESACTIVADO o Sin Ficha'}")
-                    print(f" 💻 Botón GitHub:    {'ACTIVADO' if INCLUDE_GITHUB else 'DESACTIVADO'}")
+                    print(f" 💻 Botón Web:       {'ACTIVADO' if INCLUDE_GITHUB else 'DESACTIVADO'}")
                     print("=" * 75)
                 except:
                     pass
@@ -325,11 +329,14 @@ if __name__ == "__main__":
 PYEOF
 
 # Reemplazar el marcador del ID de aplicación de Discord
-sed -i '' "s/SAVIN_DYNAMIC_CLIENT_ID/$FINAL_CLIENT_ID/g" "$HOME/.config/mpv/savin_cinema_rpc.py" 2>/dev/null || sed -i "s/SAVIN_DYNAMIC_CLIENT_ID/$FINAL_CLIENT_ID/g" "$HOME/.config/mpv/savin_cinema_rpc.py"
+sed -i '' "s/SAVIN_DYNAMIC_CLIENT_ID/$FINAL_CLIENT_ID/g" "$HOME/.config/mpv/savin_cinema_rpc.py" 2>/dev/null ||
+sed -i "s/SAVIN_DYNAMIC_CLIENT_ID/$FINAL_CLIENT_ID/g" "$HOME/.config/mpv/savin_cinema_rpc.py"
 
 # Reemplazar flags de visibilidad condicional sin comillas (como Booleanos puros de Python)
-sed -i '' "s/SAVIN_DYNAMIC_INCLUDE_INFO/$FINAL_INCLUDE_INFO/g" "$HOME/.config/mpv/savin_cinema_rpc.py" 2>/dev/null || sed -i "s/SAVIN_DYNAMIC_INCLUDE_INFO/$FINAL_INCLUDE_INFO/g" "$HOME/.config/mpv/savin_cinema_rpc.py"
-sed -i '' "s/SAVIN_DYNAMIC_INCLUDE_GITHUB/$FINAL_INCLUDE_GH/g" "$HOME/.config/mpv/savin_cinema_rpc.py" 2>/dev/null || sed -i "s/SAVIN_DYNAMIC_INCLUDE_GITHUB/$FINAL_INCLUDE_GH/g" "$HOME/.config/mpv/savin_cinema_rpc.py"
+sed -i '' "s/SAVIN_DYNAMIC_INCLUDE_INFO/$FINAL_INCLUDE_INFO/g" "$HOME/.config/mpv/savin_cinema_rpc.py" 2>/dev/null ||
+sed -i "s/SAVIN_DYNAMIC_INCLUDE_INFO/$FINAL_INCLUDE_INFO/g" "$HOME/.config/mpv/savin_cinema_rpc.py"
+sed -i '' "s/SAVIN_DYNAMIC_INCLUDE_GITHUB/$FINAL_INCLUDE_GH/g" "$HOME/.config/mpv/savin_cinema_rpc.py" 2>/dev/null ||
+sed -i "s/SAVIN_DYNAMIC_INCLUDE_GITHUB/$FINAL_INCLUDE_GH/g" "$HOME/.config/mpv/savin_cinema_rpc.py"
 
 echo -e "${GREEN}✅ Configuración modular inyectada en el núcleo.${NC}"
 echo ""
@@ -352,9 +359,11 @@ echo -e "${GREEN}✅ Lanzadores Lua listos en ambos entornos.${NC}"
 echo ""
 
 # Asegurar el socket IPC en los mpv.conf
-for CONF in "$HOME/.config/mpv/mpv.conf" "$HOME/Library/Application Support/mpv/mpv.conf"; do
+for CONF in "$HOME/.config/mpv/mpv.conf" "$HOME/Library/Application Support/mpv/mpv.conf";
+do
     touch "$CONF"
-    if ! grep -q "input-ipc-server=/tmp/mpvsocket" "$CONF"; then
+    if ! grep -q "input-ipc-server=/tmp/mpvsocket" "$CONF";
+    then
         echo "input-ipc-server=/tmp/mpvsocket" >> "$CONF"
     fi
 done
