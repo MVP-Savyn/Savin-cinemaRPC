@@ -143,7 +143,7 @@
             cursor: grab;
             align-items: center;
             width: 100%;
-            scrollbar-width: none; /* Ocultar scrollbar nativa */
+            scrollbar-width: none;
         }
 
         .carousel-track::-webkit-scrollbar {
@@ -162,7 +162,6 @@
             border: 1px solid #1f2a3c;
             position: relative;
             overflow: hidden;
-            /* La transición se desactiva durante el drag en JS para que sea instantáneo y fluido */
             transition: transform 0.1s ease-out, filter 0.1s ease-out, opacity 0.1s ease-out;
             will-change: transform, filter, opacity;
             transform-origin: center center;
@@ -173,17 +172,17 @@
             height: 100%;
             object-fit: cover;
             pointer-events: none;
-            display: block;
+            display: none; /* Se activa mediante JS solo si carga correctamente */
         }
 
-        /* Fallback elegante para las capturas png */
+        /* Fallback elegante oculto por defecto */
         .carousel-item .img-fallback {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
+            display: none; /* Se activa mediante JS si la imagen local falla */
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -201,7 +200,6 @@
             font-size: 0.95rem;
         }
 
-        /* Glow dinámico para el elemento central activo */
         .carousel-item.center-active {
             border-color: var(--accent);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 20px var(--accent-glow);
@@ -452,8 +450,8 @@
 
         .discord-timeline-fill {
             height: 100%;
-            background: #ffffff; /* Las barras de tiempo de Discord RPC activas son líneas blancas sólidas */
-            width: 49.7%; /* Ajustado matemáticamente al tiempo actual */
+            background: #ffffff;
+            width: 49.7%;
             border-radius: 2px;
         }
 
@@ -537,11 +535,11 @@
             <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC/releases/latest" class="cta-btn">Descargar Última Release</a>
         </div>
 
-        <!-- RELEVO HORIZONTAL (ESTILO MENÚ BATOCERA FLUIDO CON INTERPOLACIÓN EN TIEMPO REAL) -->
+        <!-- RELEVO HORIZONTAL (ESTILO MENÚ BATOCERA) -->
         <h2 class="section-title">Galería de Demostración</h2>
         <div class="carousel-wrapper" id="carouselWrapper">
             <div class="carousel-track" id="carouselTrack">
-                <!-- Generado dinámicamente con copias en espejo para soporte de arrastre infinito real -->
+                <!-- Generado dinámicamente -->
             </div>
         </div>
 
@@ -590,7 +588,6 @@
                         <div class="discord-header">Jugando a una aplicación</div>
                         <div class="discord-activity">
                             <div class="image-assets">
-                                <!-- Modificado rigurosamente a la ruta solicitada assets/interestellar.png con fallback integrado de seguridad -->
                                 <img class="large-image" id="mock-poster" src="assets/interestellar.png" alt="Carátula">
                                 <div class="small-image-container">
                                     <svg viewBox="0 0 24 24">
@@ -599,7 +596,6 @@
                                 </div>
                             </div>
                             <div class="activity-details">
-                                <!-- Título fijado estrictamente en CINEEE -->
                                 <div class="details-title-app">CINEEE</div>
                                 <div class="details-title" id="mock-media-title">Interstellar (2014)</div>
                                 <div class="details-row" id="mock-subtitle">🎬 Película • Ciencia Ficción / Drama</div>
@@ -647,15 +643,13 @@
         </footer>
     </div>
 
-    <!-- SCRIPT DE INTERPOLACIÓN ESTILO BATOCERA Y DIAL DE DISCORD -->
+    <!-- SCRIPT DE CORRECCIÓN VISUAL DE FALLBACK E INTERPOLACIÓN -->
     <script>
-        /* --- CONFIGURACIÓN DE IMÁGENES DEL RELEVO (CAROUSEL) --- */
         const totalImages = 7;
         const track = document.getElementById('carouselTrack');
 
         function buildCarouselDOM() {
             track.innerHTML = '';
-            // Construimos triple set espejo para garantizar el bucle infinito por arrastre continuo
             for (let loop = 0; loop < 3; loop++) {
                 for (let i = 1; i <= totalImages; i++) {
                     const item = document.createElement('div');
@@ -669,6 +663,14 @@
                     fallback.className = 'img-fallback';
                     fallback.innerHTML = `<span>assets/demo${i}.png</span>Muestra de Rich Presence`;
 
+                    // GESTIÓN DE FLUJO REPARADO:
+                    // Si carga bien, mostramos la imagen y nos aseguramos de que el fallback esté oculto
+                    img.onload = function() {
+                        this.style.display = 'block';
+                        fallback.style.display = 'none';
+                    };
+
+                    // Si no existe el archivo png aún, ocultamos la imagen y activamos el cuadro gris informativo
                     img.onerror = function() {
                         this.style.display = 'none';
                         fallback.style.display = 'flex';
@@ -683,7 +685,7 @@
 
         buildCarouselDOM();
 
-        /* --- LÓGICA DE CONTROL DINÁMICO DE ZOOM PROGRESIVO (ESTILO BATOCERA) --- */
+        /* --- LÓGICA DE CONTROL DINÁMICO DE ZOOM PROGRESIVO --- */
         let isDown = false;
         let startX;
         let scrollLeft;
@@ -691,7 +693,6 @@
         const gap = 30;        
         const singleSetWidth = (itemWidth + gap) * totalImages; 
 
-        // Función matemática centralizadora para calcular distancias y aplicar transformaciones fluidas sobre la marcha
         function updateBatoceraAnimation() {
             const trackRect = track.getBoundingClientRect();
             const trackCenter = trackRect.left + (trackRect.width / 2);
@@ -701,30 +702,21 @@
                 const itemRect = item.getBoundingClientRect();
                 const itemCenter = itemRect.left + (itemRect.width / 2);
                 
-                // Distancia absoluta al centro óptico de la pantalla
                 const distanceFromCenter = Math.abs(trackCenter - itemCenter);
-                
-                // Radio máximo de influencia (en píxeles) para interpolar el zoom
                 const maxInfluenceRadius = 380;
                 
-                // Mapeo normalizado: 1 en el centro exacto, 0 en los extremos del radio o más allá
                 let influenceRatio = 1 - Math.min(1, distanceFromCenter / maxInfluenceRadius);
-                
-                // Curva de atenuación cuadrática para suavizar la aceleración del tamaño (muy Batocera/Coverflow)
                 influenceRatio = Math.pow(influenceRatio, 2);
                 
-                // Cálculo progresivo de propiedades visuales
-                const scale = 0.86 + (0.26 * influenceRatio);       // Escala continua de 0.86x hasta 1.12x
-                const opacity = 0.45 + (0.55 * influenceRatio);    // Opacidad continua de 0.45 a 1.0
-                const blur = 2.5 * (1 - influenceRatio);           // Desenfoque progresivo decreciente
-                const grayscale = 60 * (1 - influenceRatio);       // Escala de grises decreciente hacia el centro
+                const scale = 0.86 + (0.26 * influenceRatio);       
+                const opacity = 0.45 + (0.55 * influenceRatio);    
+                const blur = 2.5 * (1 - influenceRatio);           
+                const grayscale = 60 * (1 - influenceRatio);       
                 
-                // Aplicación inmediata de los estilos calculados por hardware
                 item.style.transform = `scale(${scale})`;
                 item.style.opacity = opacity;
                 item.style.filter = `blur(${blur}px) grayscale(${grayscale}%)`;
                 
-                // Asignar bordes resaltados cuando está muy cerca del centro
                 if (distanceFromCenter < (itemWidth / 2)) {
                     item.classList.add('center-active');
                 } else {
@@ -733,7 +725,6 @@
             });
         }
 
-        // Posicionamiento de arranque en el set simétrico del medio
         window.addEventListener('load', () => {
             setTimeout(() => {
                 track.scrollLeft = singleSetWidth;
@@ -741,7 +732,6 @@
             }, 60);
         });
 
-        // Escuchadores del ciclo de arrastre con desactivación temporal de transiciones fijas para optimizar FPS
         track.addEventListener('mousedown', (e) => {
             isDown = true;
             track.style.transition = 'none';
@@ -765,13 +755,12 @@
             if(!isDown) return;
             e.preventDefault();
             const x = e.pageX - track.offsetLeft;
-            const walk = (x - startX) * 1.5; // Factor de fricción/velocidad adaptado
+            const walk = (x - startX) * 1.5; 
             track.scrollLeft = scrollLeft - walk;
             handleInfiniteLoopBounds();
             updateBatoceraAnimation();
         });
 
-        // Soporte completo para pantallas táctiles móviles
         track.addEventListener('touchstart', (e) => {
             isDown = true;
             startX = e.touches[0].pageX - track.offsetLeft;
@@ -792,7 +781,6 @@
             updateBatoceraAnimation();
         });
 
-        // Control y reubicación de límites fantasmas para el loop infinito transparente
         function handleInfiniteLoopBounds() {
             if (track.scrollLeft >= singleSetWidth * 2) {
                 track.scrollLeft -= singleSetWidth;
@@ -801,7 +789,6 @@
             }
         }
 
-        // Ajuste magnético suave al soltar el arrastre
         function snapToCenterSmooth() {
             const activeItem = document.querySelector('.carousel-item.center-active');
             if (activeItem) {
@@ -815,12 +802,10 @@
             }
         }
 
-        // Escuchador del scroll reactivo para mantener consistencia de foco e interpolación
         track.addEventListener('scroll', () => {
             handleInfiniteLoopBounds();
             updateBatoceraAnimation();
         });
-
 
         /* --- LÓGICA DE CONTROL DE MODOS DEL MOCK DE DISCORD --- */
         const onlinePosterFallback = "https://image.tmdb.org/t/p/w500/gEU2Qv0vfdsmgI7gA67vAsI1BoD.jpg";
@@ -836,14 +821,12 @@
             const poster = document.getElementById('mock-poster');
             const btnContainer = document.getElementById('mock-buttons-container');
 
-            // Apuntar obligatoriamente a la ruta especificada assets/interestellar.png
             poster.src = "assets/interestellar.png";
             poster.onerror = function() {
                 this.onerror = null;
-                this.src = onlinePosterFallback; // Respaldo en línea de TMDb ultraestable si no se ejecuta en entorno local
+                this.src = onlinePosterFallback; 
             };
 
-            // Inyección limpia según el modo activo actual
             if (mode === 'one_button') {
                 btnContainer.innerHTML = `
                     <a href="https://www.themoviedb.org/movie/157336-interstellar" target="_blank" class="discord-btn">Ver información</a>
@@ -858,7 +841,6 @@
             }
         }
 
-        // Inicialización nativa automática del estado de previsualización
         updateMock('one_button');
     </script>
 </body>
