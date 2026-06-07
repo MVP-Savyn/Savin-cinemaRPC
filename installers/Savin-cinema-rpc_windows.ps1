@@ -1,11 +1,11 @@
 # ===========================================================================
-#  Instalador Windows PowerShell: Savin-cinema-rpc v3.6 (Anti-Flicker Layout)
+#  Instalador Windows PowerShell: Savin-cinema-rpc v3.7 (Clean Stream Layout)
 # ===========================================================================
 $OutputEncoding = [System.Text.Encoding]::UTF8
 Clear-Host
 
 Write-Host "==================================================" -ForegroundColor Blue
-Write-Host "    Instalador Windows: Savin-cinema-rpc v3.6     " -ForegroundColor Cyan
+Write-Host "    Instalador Windows: Savin-cinema-rpc v3.7     " -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Blue
 Write-Host ""
 
@@ -60,7 +60,7 @@ if (-not (Test-Path $MpvScripts)) {
 }
 
 # 6. Escribir archivos de control
-Write-Host "[6/6] [CORE] Desplegando nucleo optimizado Anti-Zombis..." -ForegroundColor Yellow
+Write-Host "[6/6] [CORE] Desplegando nucleo con filtros anti-publicidad..." -ForegroundColor Yellow
 
 $PythonCode = @'
 import os
@@ -79,17 +79,35 @@ INCLUDE_GITHUB = SAVIN_DYNAMIC_INCLUDE_GITHUB
 SOCKET_PATH = r'\\.\pipe\mpvsocket'
 TMDB_API_KEY = 'cd8015c4e4de965057e0282c9d19610f'
 
-RAW_CLEAN_TAGS = ['1080p', '720p', '4k', '2160p', 'bluray', 'bdrip', 'brrip', 'h264', 'x264', 'x265', 'h265', 'hevc', 'web-dl', 'webdl', 'dvdrip', 'screener', 'aac', 'ac3', 'mp3', 'dual', 'hdr', 'remux', 'atmos', 'dts']
+# Lista expandida con calidad, codecs y variantes comunes de resoluciones (M1080p, microhd, etc.)
+RAW_CLEAN_TAGS = [
+    '1080p', '720p', '4k', '2160p', 'm1080p', 'm720p', 'microhd', 'hd', 'bd1080', 'm1080', 'm720',
+    'bluray', 'bdrip', 'brrip', 'h264', 'x264', 'x265', 'h265', 'hevc', 'bdeditor',
+    'web-dl', 'webdl', 'dvdrip', 'screener', 'aac', 'ac3', 'mp3', 'dual', 
+    'hdr', 'remux', 'atmos', 'dts', 'rip'
+]
 
 def clean_filename_generic(filename):
     if not filename: return ""
     name, _ = os.path.splitext(filename)
-    name = re.sub(r'\[.*?\]', '', name)
-    name = re.sub(r'\(.*?\)', '', name)
-    for tag in RAW_CLEAN_TAGS: 
-        name = re.sub(r'(?i)\b' + tag + r'\b', '', name)
+    
+    # 1. Eliminar dominios web
+    name = re.sub(r'(?i)(www\.)?[-a-z0-9]+\.(com|net|org|vip|biz|info|io|tv|me|es|mx|co)', ' ', name)
+    
+    # 2. Eliminar corchetes y paréntesis
+    name = re.sub(r'\[.*?\]|\(.*?\)', ' ', name)
+    
+    # 3. Limpiar tags (M1080, etc.)
+    # IMPORTANTE: Hemos quitado los años de 4 dígitos de la lista RAW_CLEAN_TAGS 
+    # si es que tenías alguno ahí.
+    for tag in RAW_CLEAN_TAGS:
+        name = re.sub(r'(?i)' + tag, ' ', name)
+        
+    # 4. Convertir separadores en espacios
     name = name.replace('.', ' ').replace('_', ' ').replace('-', ' ')
-    return re.sub(r'\s+', ' ', name).strip('. -_')
+    
+    # 5. Limpieza final de espacios duplicados
+    return re.sub(r'\s+', ' ', name).strip()
 
 def parse_media_type(filename):
     if not filename: return None, None, None
@@ -131,13 +149,13 @@ def get_media_data(filename):
                 poster = f"https://image.tmdb.org/t/p/w500{match.get('poster_path')}" if match.get('poster_path') else "mpv-icon"
                 movie_id = match.get('id')
                 tmdb_url = f"https://www.themoviedb.org/{view_url_base}/{movie_id}" if movie_id else None
+                print(f"[DEBUG] Buscando: '{clean_title}' | Resultado encontrado: '{titulo_final}' | Poster: {poster}")
                 return titulo_final, ep_info, poster, tmdb_url
         except: pass
     return clean_title, ep_info, "mpv-icon", None
 
 def send_mpv_command(cmd_name, *args):
     try:
-        # Abrir y cerrar la conexion de forma efimera y sin buffer evita bloqueos fantasmas
         with open(SOCKET_PATH, 'r+b', buffering=0) as f:
             message = {"command": [cmd_name] + list(args)}
             f.write(json.dumps(message).encode('utf-8') + b'\n')
@@ -170,7 +188,7 @@ def main():
         res = send_mpv_command("get_property", "filename")
         if res == "__SOCKET_DEAD__":
             consecutive_failures += 1
-            if consecutive_failures >= 10:  # Tolerancia extendida para cargas de red pesadas
+            if consecutive_failures >= 10:
                 try:
                     RPC.clear()
                     RPC.close()
@@ -183,7 +201,7 @@ def main():
         filename = res
         
         if filename:
-            idle_counter = 0  # Reiniciar escudo anti-parpadeo
+            idle_counter = 0
             paused = send_mpv_command("get_property", "pause")
             time_pos = send_mpv_command("get_property", "time-pos")
             duration = send_mpv_command("get_property", "duration")
@@ -247,7 +265,7 @@ def main():
                     last_update_time = now
                     print("\033[H\033[J", end="")
                     print("=" * 75)
-                    print(" \U0001F3AC   MPV DISCORD RICH PRESENCE - WINDOWS PIPES LAYOUT v3.6 \U0001F3AC")
+                    print(" \U0001F3AC   MPV DISCORD RICH PRESENCE - WINDOWS PIPES LAYOUT v3.7 \U0001F3AC")
                     print("=" * 75)
                     print(f" \U0001F3A5 Medio:          '{display_title}'")
                     if ep_info: print(f" \U0001F4FA Info Serie:      {ep_info}")
@@ -255,7 +273,6 @@ def main():
                     print("=" * 75)
                 except: pass
         else:
-            # Escudo de gracia: Espera 5 segundos continuos antes de limpiar el estado
             idle_counter += 1
             if idle_counter >= 5:
                 if last_state != 'idle':
@@ -279,12 +296,12 @@ $PythonCode = $PythonCode.Replace('SAVIN_DYNAMIC_INCLUDE_GITHUB', $IncludeGH)
 
 $PythonFile = "$MpvAppData\savin_cinema_rpc.py"
 [System.IO.File]::WriteAllText($PythonFile, $PythonCode, [System.Text.Encoding]::UTF8)
-Write-Host "[OK] Nucleo de Python inyectado sin buffers." -ForegroundColor Green
+Write-Host "[OK] Nucleo de Python inyectado con filtros limpios." -ForegroundColor Green
 
-# Disparador LUA Literales [[ ]]
+# Disparador LUA
 $LuaCode = @"
--- Disparador definitivo para Windows (Safe-Paths Layout v3.6)
-mp.msg.info("Iniciando puente de Discord Rich Presence v3.6...")
+-- Disparador definitivo para Windows (Safe-Paths Layout v3.7)
+mp.msg.info("Iniciando puente de Discord Rich Presence v3.7...")
 mp.command_native_async({
     name = "subprocess",
     args = {[[$RealPython]], [[$MpvAppData\savin_cinema_rpc.py]]},
@@ -304,6 +321,6 @@ if ($ConfContent -notcontains "input-ipc-server=mpvsocket") {
 
 Write-Host ""
 Write-Host "==================================================" -ForegroundColor Blue
-Write-Host "  Savin-CinemaRPC v3.6 listo y blindado!           " -ForegroundColor Green
+Write-Host "  Savin-CinemaRPC v3.7 listo y purificado!         " -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Blue
 Read-Host "Presiona cualquier tecla para finalizar..."
