@@ -39,17 +39,17 @@ Bro, simplemente es brutal poder lucir la carátula real de lo que estás vien
 
 Gracias al nuevo sistema modular, puedes elegir exactamente cómo lucirá tu perfil en Discord según tus preferencias de espacio:
 
-### 1. Ficha de Información Completa (`Ver información`)
+### 1. Un botón (`Ver información`)
 Muestra los detalles del archivo junto con un botón interactivo llamado **"Ver información"** que redirige a la ficha oficial de la película o serie en la web de TMDb.
 
 ![Configuración con Botón de Información](assets/discord_paused-no-github.png)
 
-### 2. Ficha de Desarrollador (`GitHub`)
+### 2. Dos botones (`Info + GitHub`)
 Ideal si quieres dar créditos al proyecto o enlazar tu propio repositorio de personalizaciones. Añade un botón directo hacia la plataforma de desarrollo.
 
 ![Configuración con Botón de GitHub](assets/discord_paused-github.png)
 
-### 3. Perfil Ultra-Minimalista (Sin Botones)
+### 3. Minimalista
 Para los amantes del minimalismo absoluto. Si desactivas ambos botones en el instalador, la presencia se envía limpia sin ocupar espacio vertical innecesario, dejando un diseño compacto en el miniperfil de Discord.
 
 ![Configuración Sin Botones](assets/normal.png)
