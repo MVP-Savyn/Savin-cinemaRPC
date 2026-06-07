@@ -1,252 +1,267 @@
 @echo off
+CHCP 65001 > NUL
+setlocal EnabledDelayedExpansion
+
+title Instalador Oficial: Savin-cinema-rpc v3.3 (Windows)
 cls
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Invoke-Expression ((Get-Content '%~f0' | Select-Object -Skip 4) -join [Environment]::NewLine)"
-exit /b
+echo ==================================================
+echo     Instalador Oficial: Savin-cinema-rpc v3.3   
+echo ==================================================
+echo.
 
-$ErrorActionPreference = "Stop"
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+:: 1. Detectar el entorno de Python real en Windows
+echo [1/8] 🔍 Buscando tu entorno de Python...
+where python >nul 2>nul
+if %errorlevel% neq 0 (
+    echo ❌ Error: No se ha detectado Python en el PATH del sistema.
+    echo Por favor, instálalo desde la Microsoft Store o su web oficial
+    echo y asegúrate de marcar la opción "Add Python to PATH".
+    echo.
+    pause
+    exit /b
+)
+echo ✅ Python detectado en el sistema.
+echo.
 
-Clear-Host
-Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "    Instalador Oficial Windows: Savin-cinema-rpc  " -ForegroundColor Cyan
-Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host ""
+:: 2. Configuración de Discord Application ID
+set "FINAL_CLIENT_ID=1512598323725602878"
+echo [2/8] 🆔 Configuración de Discord Application ID...
+echo Introduce tu CLIENT_ID personalizado si tienes uno.
+echo O simplemente presiona [ENTER] para usar el ID por defecto (1512598323725602878):
+set /p "USER_INPUT_ID=❯ "
+if not "!USER_INPUT_ID!"=="" set "FINAL_CLIENT_ID=!USER_INPUT_ID!"
+echo ➡ ID Aplicado: !FINAL_CLIENT_ID!
+echo.
 
-# 1. Validar presencia de Python 3
-try {
-    $pyCheck = python --version 2>$null
-    Write-Host "✅ Python detectado correctamente en el sistema." -ForegroundColor Green
-} catch {
-    Write-Host "❌ Error: No se ha detectado Python en el PATH de Windows." -ForegroundColor Red
-    Write-Host "Por favor, descarga Python 3 de la web oficial e instálalo." -ForegroundColor Yellow
-    Write-Host "Asegúrate de marcar la casilla 'Add Python to PATH' en el instalador." -ForegroundColor LightYellow
-    Write-Host ""
-    Read-Host "Presiona Enter para salir..."
-    exit
-}
-Write-Host ""
+:: 3. Selector Opcional del Botón de Información
+set "FINAL_INCLUDE_INFO=True"
+echo [3/8] 🎬 Configuración del botón 'Ver información'...
+echo ¿Deseas mostrar el botón de información de TMDb en Discord?
+echo Presiona [ENTER] para Sí (Por defecto) o introduce n para No:
+set /p "USER_INPUT_INFO=❯ "
+if /i "!USER_INPUT_INFO!"=="n" set "FINAL_INCLUDE_INFO=False"
+echo ➡ Botón de Información: !FINAL_INCLUDE_INFO!
+echo.
 
-# 2. Preguntar de forma interactiva por la ubicación de MPV
-Write-Host "[1/3] 📂 Configuración del directorio de MPV:" -ForegroundColor Yellow
-Write-Host "1. Usar ubicación por defecto (%APPDATA%\mpv)"
-Write-Host "2. Usar una carpeta o ruta específica personalizada"
-Write-Host ""
-$opt = Read-Host "Elige una opción (1 o 2)"
+:: 4. Selector Opcional del Botón GitHub
+set "FINAL_INCLUDE_GH=True"
+echo [4/8] 💻 Configuración del botón de GitHub...
+echo ¿Deseas mostrar el botón hacia tu repositorio de GitHub?
+echo Presiona [ENTER] para Sí (Por defecto) o introduce n para No:
+set /p "USER_INPUT_GH=❯ "
+if /i "!USER_INPUT_GH!"=="n" set "FINAL_INCLUDE_GH=False"
+echo ➡ Botón de GitHub: !FINAL_INCLUDE_GH!
+echo.
 
-if ($opt -eq "2") {
-    Write-Host ""
-    $customPath = Read-Host "Introduce la ruta absoluta de tu carpeta MPV (Ej: C:\Herramientas\mpv)"
-    $mpvDir = $customPath.Replace('"', '').Trim()
-} else {
-    $mpvDir = "$env:APPDATA\mpv"
-}
-
-# Asegurar la existencia de la carpeta destino
-if (-not (Test-Path $mpvDir)) {
-    New-Item -ItemType Directory -Path $mpvDir -Force | Out-Null
-    Write-Host "📂 Carpeta creada automáticamente: $mpvDir" -ForegroundColor Gray
-} else {
-    Write-Host "✅ Carpeta de MPV confirmada: $mpvDir" -ForegroundColor Green
-}
-Write-Host ""
-
-# 3. Preguntar por Client ID
-Write-Host "[2/3] 🆔 Configuración de Discord Application ID..." -ForegroundColor Yellow
-$defaultId = "1512598323725602878"
-Write-Host "Introduce tu CLIENT_ID personalizado si tienes uno."
-$userId = Read-Host "O presiona [ENTER] para usar el ID por defecto ($defaultId)"
-
-if ([string]::IsNullOrWhiteSpace($userId)) {
-    $finalId = $defaultId
-} else {
-    $finalId = $userId.Trim()
-}
-Write-Host "➡ Aplicado ID: $finalId" -ForegroundColor Green
-Write-Host ""
-
-# 4. Instalar librerías de Python
-Write-Host "[3/3] 📦 Instalando dependencias de Python (pypresence, requests)..." -ForegroundColor Yellow
+:: 5. Asegurar librerías de Python de forma silenciosa
+echo [5/8] 📦 Instalando dependencias necesarias (requests, pypresence)...
 python -m pip install --upgrade pip --quiet
 python -m pip install requests pypresence --quiet
-Write-Host "✅ Dependencias de Python listas." -ForegroundColor Green
-Write-Host ""
+echo ✅ Dependencias listas.
+echo.
 
-# Preparar las rutas de los scripts
-$scriptPath = Join-Path $mpvDir "savin_cinema_rpc.py"
-$escapedScriptPath = $scriptPath.Replace('\', '\\')
-$luaScriptsFolder = Join-Path $mpvDir "scripts"
+:: 6. Crear árbol de directorios de MPV en AppData
+echo [6/8] 📂 Verificando estructura de directorios de MPV...
+if not exist "%APPDATA%\mpv\scripts" mkdir "%APPDATA%\mpv\scripts"
+echo ✅ Estructura de directorios OK.
+echo.
 
-if (-not (Test-Path $luaScriptsFolder)) {
-    New-Item -ItemType Directory -Path $luaScriptsFolder -Force | Out-Null
-}
-$luaPath = Join-Path $luaScriptsFolder "discord_launcher.lua"
+:: 7. Escribir script de control v3.3 adaptado a Pipes de Windows mediante inyección limpia
+echo [7/8] 🐍 Escribiendo script de control (savin_cinema_rpc.py)...
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+    "$id='!FINAL_CLIENT_ID!'; $info=!FINAL_INCLUDE_INFO!; $gh=!FINAL_INCLUDE_GH!; [void](gc '%~f0' | ? {$_ -like '##PY:*'} | %% { $_ -replace '##PY:','' -replace 'SAVIN_DYNAMIC_CLIENT_ID',$id -replace 'SAVIN_DYNAMIC_INCLUDE_INFO',$info -replace 'SAVIN_DYNAMIC_INCLUDE_GITHUB',$gh } | Out-File -FilePath \"$env:APPDATA\mpv\savin_cinema_rpc.py\" -Encoding utf8)"
+echo ✅ Configuración modular inyectada con éxito en el núcleo de Windows.
+echo.
 
-# 5. Escribir el Script de Python optimizado con tuberías Win32 nativas (ctypes)
-Write-Host "🐍 Generando script de control de Windows (savin_cinema_rpc.py)..." -ForegroundColor Magenta
-$pythonCode = @"
-import os
-import sys
-import json
-import time
-import re
-import requests
-import ctypes
-from pypresence import Presence
+:: 8. Generar el disparador .lua asíncrono para Windows (Usa pythonw para ocultar la consola)
+echo [8/8] 🌙 Sincronizando disparador Lua para Windows...
+(
+echo -- Disparador definitivo para Savin-cinema-rpc (Windows^)
+echo mp.msg.info("Iniciando puente de Discord Rich Presence..."^)
+echo.
+echo mp.command_native_async({
+echo     name = "subprocess",
+echo     args = {"pythonw", mp.command_native("expand-path", "~~/savin_cinema_rpc.py"^)},
+echo     playback_only = false
+echo })
+) > "%APPDATA%\mpv\scripts\discord_launcher.lua"
+echo ✅ Lanzador Lua configurado en segundo plano invisible.
+echo.
 
-# Evitar fallos de entrada/salida si corre bajo pythonw sin consola
-if sys.stdout is None:
-    class DummyWriter:
-        def write(self, *args, **kwargs): pass
-        def flush(self): pass
-    sys.stdout = DummyWriter()
-    sys.stderr = DummyWriter()
+:: Asegurar el servidor IPC por tuberías (Named Pipes) en el mpv.conf de Windows
+if not exist "%APPDATA%\mpv\mpv.conf" type nul > "%APPDATA%\mpv\mpv.conf"
+findstr /C:"input-ipc-server=\\\\.\\pipe\\mpvsocket" "%APPDATA%\mpv\mpv.conf" >nul
+if %errorlevel% neq 0 (
+    echo input-ipc-server=\\.\pipe\mpvsocket >> "%APPDATA%\mpv\mpv.conf"
+    echo ✅ Línea de servidor IPC de Windows añadida a tu mpv.conf
+)
 
-CLIENT_ID = '$finalId'
-PIPE_PATH = r'\\.\pipe\mpvsocket'
-TMDB_API_KEY = 'cd8015c4e4de965057e0282c9d19610f'
+echo ==================================================
+echo  🎉 ¡Savin-cinema-rpc v3.3 instalado con éxito!  
+echo ==================================================
+echo.
+echo Presiona cualquier tecla para cerrar el instalador...
+pause >nul
+exit /b
 
-debug_tmdb_url = "Ninguna petición realizada"
-debug_tmdb_status = "Esperando reproducción..."
-debug_discord_payload = {}
-
-def clean_filename(filename):
-    if not filename: return ""
-    name, _ = os.path.splitext(filename)
-    name = re.sub(r'\[.*?\]', '', name)
-    name = re.sub(r'\(.*?\)', '', name)
-    tags = ['1080p', '720p', '4k', '2160p', 'bluray', 'bdrip', 'brrip', 'h264', 'x264', 'x265', 'h265', 'hevc', 'web-dl', 'webdl', 'dvdrip', 'screener', 'aac', 'ac3', 'mp3', 'dual', 'hdr', 'remux', 'atmos', 'dts']
-    for tag in tags: name = re.sub(r'(?i)\b' + tag + r'\b', '', name)
-    name = name.replace('.', ' ').replace('_', ' ').replace('-', ' ')
-    return re.sub(r'\s+', ' ', name).strip('. -_')
-
-def get_movie_data(title):
-    global debug_tmdb_url, debug_tmdb_status
-    clean_title = clean_filename(title)
-    if not clean_title:
-        debug_tmdb_status = "Cancelado: Vacío"
-        return title, "mpv-icon"
-    url_es = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(clean_title)}&language=es-ES"
-    url_en = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(clean_title)}&language=en-US"
-    debug_tmdb_url = url_es
-    for url in [url_es, url_en]:
-        try:
-            response = requests.get(url, timeout=4)
-            debug_tmdb_status = f"HTTP {response.status_code}"
-            if response.status_code != 200: continue
-            results = response.json().get('results', [])
-            if results:
-                match = results[0]
-                titulo_real = match.get('title', clean_title)
-                fecha = match.get('release_date', '')
-                titulo_final = f"{titulo_real} ({fecha.split('-')[0]})" if fecha else titulo_real
-                poster = f"https://image.tmdb.org/t/p/w500{match.get('poster_path')}" if match.get('poster_path') else "mpv-icon"
-                debug_tmdb_status = f"HTTP 200 OK (¡Encontrada!: {titulo_final})"
-                return titulo_final, poster
-        except Exception as e:
-            debug_tmdb_status = f"Error: {str(e)}"
-    return clean_title, "mpv-icon"
-
-def send_mpv_command(cmd_name, *args):
-    try:
-        GENERIC_READ = 0x80000000
-        GENERIC_WRITE = 0x40000000
-        OPEN_EXISTING = 3
-        
-        handle = ctypes.windll.kernel32.CreateFileW(
-            PIPE_PATH, GENERIC_READ | GENERIC_WRITE, 0, None, OPEN_EXISTING, 0, None
-        )
-        if handle == -1: return None
-        
-        message = {"command": [cmd_name] + list(args)}
-        data = (json.dumps(message) + "\n").encode('utf-8')
-        
-        written = ctypes.c_ulong(0)
-        ctypes.windll.kernel32.WriteFile(handle, data, len(data), ctypes.byref(written), None)
-        
-        response = b""
-        read_bytes = ctypes.c_ulong(0)
-        char_buf = ctypes.create_string_buffer(1)
-        
-        while True:
-            res = ctypes.windll.kernel32.ReadFile(handle, char_buf, 1, ctypes.byref(read_bytes), None)
-            if not res or read_bytes.value == 0: break
-            response += char_buf.raw[:read_bytes.value]
-            if response.endswith(b'\n'): break
-            
-        ctypes.windll.kernel32.CloseHandle(handle)
-        return json.loads(response.decode('utf-8')).get("data")
-    except: return None
-
-def main():
-    global debug_discord_payload, debug_tmdb_url, debug_tmdb_status
-    try:
-        RPC = Presence(CLIENT_ID)
-        RPC.connect()
-    except: return
-    last_filename = ""
-    display_title, imagen_caratula = "", "mpv-icon"
-    while True:
-        filename = send_mpv_command("get_property", "filename")
-        if filename:
-            paused = send_mpv_command("get_property", "pause")
-            time_pos = send_mpv_command("get_property", "time-pos")
-            duration = send_mpv_command("get_property", "duration")
-            if filename != last_filename:
-                display_title, imagen_caratula = get_movie_data(filename)
-                last_filename = filename
-            try:
-                t_actual = int(float(time_pos)) if time_pos is not None else 0
-                t_total = int(float(duration)) if duration is not None else 0
-            except: t_actual, t_total = 0, 0
-            state_str = "Pausado" if paused else "Reproduciendo"
-            progreso_actual = time.strftime('%H:%M:%S', time.gmtime(t_actual)) if t_actual >= 3600 else time.strftime('%M:%S', time.gmtime(t_actual))
-            progreso_total = time.strftime('%H:%M:%S', time.gmtime(t_total)) if t_total >= 3600 else time.strftime('%M:%S', time.gmtime(t_total))
-            linea_estado_discord = f"{state_str} | {progreso_actual} / {progreso_total}"
-            payload = {"details": display_title, "state": linea_estado_discord, "large_image": imagen_caratula, "large_text": "mpv media player"}
-            debug_discord_payload = payload
-            try:
-                RPC.update(**payload)
-            except: pass
-        else:
-            try:
-                RPC.clear()
-                last_filename = ""
-            except: pass
-        time.sleep(2)
-
-if __name__ == "__main__":
-    main()
-"@
-Set-Content -Path $scriptPath -Value $pythonCode -Encoding UTF8
-
-# 6. Escribir lanzador Lua inyectando la ruta absoluta y llamando a pythonw
-Write-Host "🌙 Creando disparador en segundo plano (discord_launcher.lua)..." -ForegroundColor Magenta
-$luaCode = @"
--- Disparador optimizado para Windows (Savin-cinema-rpc)
-mp.msg.info("Iniciando puente de Discord Rich Presence...")
-
-mp.command_native_async({
-    name = "subprocess",
-    args = {"pythonw", "$escapedScriptPath"},
-    playback_only = false
-})
-"@
-Set-Content -Path $luaPath -Value $luaCode -Encoding UTF8
-
-# 7. Forzar la directiva Named Pipe en el mpv.conf de esa carpeta
-Write-Host "🛠️ Añadiendo servidor Pipe IPC a tu mpv.conf..." -ForegroundColor Magenta
-$confPath = Join-Path $mpvDir "mpv.conf"
-if (-not (Test-Path $confPath)) {
-    New-Item -ItemType File -Path $confPath -Force | Out-Null
-}
-$confContent = Get-Content $confPath -Raw
-if ($confContent -notmatch "input-ipc-server=\\\\.\\\\pipe\\\\mpvsocket") {
-    Add-Content $confPath "`ninput-ipc-server=\\.\pipe\mpvsocket"
-}
-
-Write-Host ""
-Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host " 🎉 ¡Savin-cinema-rpc configurado en Windows!     " -ForegroundColor Green
-Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host ""
-Read-Host "Presiona cualquier tecla para cerrar el instalador..."
+:: ==================================================================================
+:: CÓDIGO NÚCLEO PYTHON (Extraído dinámicamente por la rutina de PowerShell)
+:: ==================================================================================
+##PY:import os
+##PY:import socket
+##PY:import json
+##PY:import time
+##PY:import re
+##PY:import requests
+##PY:import sys
+##PY:from pypresence import Presence
+##PY:
+##PY:CLIENT_ID = 'SAVIN_DYNAMIC_CLIENT_ID'
+##PY:GITHUB_URL = 'https://github.com/MVP-Savyn/Savin-cinemaRPC'
+##PY:INCLUDE_INFO = SAVIN_DYNAMIC_INCLUDE_INFO
+##PY:INCLUDE_GITHUB = SAVIN_DYNAMIC_INCLUDE_GITHUB
+##PY:SOCKET_PATH = r'\\.\pipe\mpvsocket'
+##PY:TMDB_API_KEY = 'cd8015c4e4de965057e0282c9d19610f'
+##PY:
+##PY:RAW_CLEAN_TAGS = ['1080p', '720p', '4k', '2160p', 'bluray', 'bdrip', 'brrip', 'h264', 'x264', 'x265', 'h265', 'hevc', 'web-dl', 'webdl', 'dvdrip', 'screener', 'aac', 'ac3', 'mp3', 'dual', 'hdr', 'remux', 'atmos', 'dts']
+##PY:
+##PY:def clean_filename_generic(filename):
+##PY:    if not filename: return ""
+##PY:    name, _ = os.path.splitext(filename)
+##PY:    name = re.sub(r'\[.*?\]', '', name)
+##PY:    name = re.sub(r'\(.*?\)', '', name)
+##PY:    for tag in RAW_CLEAN_TAGS: name = re.sub(r'(?i)\b' + tag + r'\b', '', name)
+##PY:    name = name.replace('.', ' ').replace('_', ' ').replace('-', ' ')
+##PY:    return re.sub(r'\s+', ' ', name).strip('. -_')
+##PY:
+##PY:def parse_media_type(filename):
+##PY:    if not filename: return None, None, None
+##PY:    name_no_ext, _ = os.path.splitext(filename)
+##PY:    pattern = re.compile(r'(?i)(.*?)[ ._\[\-](?:[Ss](\d+)[Ee](\d+)|(\d+)x(\d+))')
+##PY:    match = pattern.search(name_no_ext)
+##PY:    if match:
+##PY:        raw_title = match.group(1)
+##PY:        if match.group(2): s_num, e_num = match.group(2), match.group(3)
+##PY:        else: s_num, e_num = match.group(4), match.group(5)
+##PY:        clean_title = clean_filename_generic(raw_title)
+##PY:        return clean_title, f"Temporada {int(s_num)} - Episodio {int(e_num)}", "tv"
+##PY:    return clean_filename_generic(filename), None, "movie"
+##PY:
+##PY:def get_media_data(filename):
+##PY:    clean_title, ep_info, media_type = parse_media_type(filename)
+##PY:    if not clean_title: return filename, None, "mpv-icon", None
+##PY:    if media_type == "tv":
+##PY:        search_endpoint = "search/tv"
+##PY:        view_url_base = "tv"
+##PY:    else:
+##PY:        search_endpoint = "search/movie"
+##PY:        view_url_base = "movie"
+##PY:    url_es = f"https://api.themoviedb.org/3/{search_endpoint}?api_key={TMDB_API_KEY}&query={requests.utils.quote(clean_title)}&language=es-ES"
+##PY:    url_en = f"https://api.themoviedb.org/3/{search_endpoint}?api_key={TMDB_API_KEY}&query={requests.utils.quote(clean_title)}&language=en-US"
+##PY:    for url in [url_es, url_en]:
+##PY:        try:
+##PY:            response = requests.get(url, timeout=4)
+##PY:            if response.status_code != 200: continue
+##PY:            results = response.json().get('results', [])
+##PY:            if results:
+##PY:                match = results[0]
+##PY:                titulo_real = match.get('name') if media_type == "tv" else match.get('title', clean_title)
+##PY:                fecha = match.get('first_air_date') if media_type == "tv" else match.get('release_date', '')
+##PY:                fecha_year = fecha.split('-')[0] if fecha else ""
+##PY:                titulo_final = f"{titulo_real} ({fecha_year})" if fecha_year else titulo_real
+##PY:                poster = f"https://image.tmdb.org/t/p/w500{match.get('poster_path')}" if match.get('poster_path') else "mpv-icon"
+##PY:                movie_id = match.get('id')
+##PY:                tmdb_url = f"https://www.themoviedb.org/{view_url_base}/{movie_id}" if movie_id else None
+##PY:                return titulo_final, ep_info, poster, tmdb_url
+##PY:        except: pass
+##PY:    return clean_title, ep_info, "mpv-icon", None
+##PY:
+##PY:def send_mpv_command(cmd_name, *args):
+##PY:    try:
+##PY:        with open(SOCKET_PATH, 'r+b', buffering=0) as pipe:
+##PY:            message = {"command": [cmd_name] + list(args)}
+##PY:            pipe.write(json.dumps(message).encode('utf-8') + b'\n')
+##PY:            res = pipe.readline().decode('utf-8')
+##PY:            return json.loads(res).get("data")
+##PY:    except: return "__SOCKET_DEAD__"
+##PY:
+##PY:def generate_progress_bar(current, total, length=6):
+##PY:    if total <= 0: return "🔘" + "▬" * (length - 1)
+##PY:    percent = max(0.0, min(1.0, current / total))
+##PY:    filled_length = int(round(length * percent))
+##PY:    if filled_length >= length: filled_length = length - 1
+##PY:    return "▬" * filled_length + "🔘" + "▬" * (length - filled_length - 1)
+##PY:
+##PY:def main():
+##PY:    try:
+##PY:        RPC = Presence(CLIENT_ID)
+##PY:        RPC.connect()
+##PY:    except: return
+##PY:    last_state, last_filename, last_toggle_time, last_update_time = None, "", 0, 0
+##PY:    display_title, ep_info, imagen_caratula, movie_url = "", None, "mpv-icon", None
+##PY:    while True:
+##PY:        res = send_mpv_command("get_property", "filename")
+##PY:        if res == "__SOCKET_DEAD__":
+##PY:            try: RPC.clear(); RPC.close()
+##PY:            except: pass
+##PY:            sys.exit(0)
+##PY:        filename = res
+##PY:        if filename:
+##PY:            paused = send_mpv_command("get_property", "pause")
+##PY:            time_pos = send_mpv_command("get_property", "time-pos")
+##PY:            duration = send_mpv_command("get_property", "duration")
+##PY:            if "__SOCKET_DEAD__" in [paused, time_pos, duration]:
+##PY:                try: RPC.clear(); RPC.close()
+##PY:                except: pass
+##PY:                sys.exit(0)
+##PY:            try:
+##PY:                t_actual = int(float(time_pos)) if time_pos is not None else 0
+##PY:                t_total = int(float(duration)) if duration is not None else 0
+##PY:            except: t_actual, t_total = 0, 0
+##PY:            current_state = 'paused' if paused else 'playing'
+##PY:            now = time.time()
+##PY:            if filename != last_filename:
+##PY:                display_title, ep_info, imagen_caratula, movie_url = get_media_data(filename)
+##PY:                last_filename = filename
+##PY:            progreso_actual = time.strftime('%H:%M:%S', time.gmtime(t_actual)) if t_actual >= 3600 else time.strftime('%M:%S', time.gmtime(t_actual))
+##PY:            progreso_total = time.strftime('%H:%M:%S', time.gmtime(t_total)) if t_total >= 3600 else time.strftime('%M:%S', time.gmtime(t_total))
+##PY:            barras_visuales = generate_progress_bar(t_actual, t_total)
+##PY:            payload = {"details": display_title, "large_image": imagen_caratula, "large_text": "mpv media player"}
+##PY:            prefix_status = "📺 " if ep_info else ""
+##PY:            time_status = f"{ep_info} | {progreso_actual} {barras_visuales} {progreso_total}" if ep_info else f"{progreso_actual} {barras_visuales} {progreso_total}"
+##PY:            payload["state"] = f"⏸️ {prefix_status}{time_status}" if current_state == 'paused' else f"▶ {prefix_status}{time_status}"
+##PY:            buttons_list = []
+##PY:            if INCLUDE_INFO and movie_url: buttons_list.append({"label": "Ver información", "url": movie_url})
+##PY:            if INCLUDE_GITHUB: buttons_list.append({"label": "Github", "url": GITHUB_URL})
+##PY:            if buttons_list: payload["buttons"] = buttons_list
+##PY:            state_changed = (current_state != last_state)
+##PY:            time_to_update = (now - last_update_time >= 10.0)
+##PY:            can_send = False
+##PY:            if state_changed:
+##----
+##PY:                if now - last_toggle_time >= 3.0: can_send = True; last_toggle_time = now
+##PY:            elif current_state == 'playing' and time_to_update: can_send = True
+##PY:            if can_send:
+##PY:                try:
+##PY:                    RPC.update(**payload)
+##PY:                    last_state = current_state
+##PY:                    last_update_time = now
+##PY:                    os.system('cls')
+##PY:                    print("=" * 75)
+##PY:                    print(" 🎬   MPV DISCORD RICH PRESENCE - WINDOWS CUSTOM LAYOUT v3.3 🎬")
+##PY:                    print("=" * 75)
+##PY:                    print(f" 🎥 Medio:          '{display_title}'")
+##PY:                    if ep_info: print(f" 📺 Info Serie:      {ep_info}")
+##PY:                    print(f" ⚙️  Estado RPC:      {payload['state']}")
+##PY:                    print(f" 🎬 Botón Info:      {'ACTIVADO' if (INCLUDE_INFO and movie_url) else 'DESACTIVADO o Sin Ficha'}")
+##PY:                    print(f" 💻 Botón GitHub:    {'ACTIVADO' if INCLUDE_GITHUB else 'DESACTIVADO'}")
+##PY:                    print("=" * 75)
+##PY:                except: pass
+##PY:        else:
+##PY:            if last_state != 'idle':
+##PY:                try: RPC.clear(); last_state = 'idle'; last_filename = ""; movie_url = None; ep_info = None
+##PY:                except: pass
+##PY:        time.sleep(1)
+##PY:
+##PY:if __name__ == "__main__":
+##PY:    main()

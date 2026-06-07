@@ -1,66 +1,74 @@
 # Savin-cinema-rpc 🎬
 
-Un mod muy simple que envía a discord la información de lo que estás viendo en **local o streaming** con **mpv**, incluyendo la carátula de la película y el minuto de reproducción.
+Un mod multiplataforma y altamente personalizable que envía a Discord la información de lo que estás viendo en **local o streaming** utilizando **mpv**, incluyendo la carátula oficial del contenido y el minuto exacto de reproducción.
 
-Esta script detecta dinámicamente tu reproducción en mpv, procesa y limpia los nombres de los archivos locales o en streaming (ideal para combinar con **rclone** para usar una nube con películas en remoto) mediante expresiones regulares avanzadas, e interactúa con la API de **The Movie Database (TMDB)** para mostrar el póster oficial y el título estilizado de la película directamente en tu perfil de Discord.
-<br><br>
-Bro simplemente es brutal poder ver en discord la carátula de la película, hay varios mods de mpv pero este aplica una carátula aunque los metadatos de tu archivo **p1r4t4** estén modificados, con tan sólo poner el nombre del archivo con el título de la película (que en la mayor parte de las ocasiones no tendrás que hacerlo porque el mod omite todos los elementos como puntos o enlaces), el mod hace el resto.
+## 📺 Soporte Inteligente para Películas y Series
+El script cuenta con un sistema de detección dinámica. Mediante expresiones regulares avanzadas, procesa y limpia los nombres de los archivos locales o en streaming (ideal para nubes remotas montadas con **rclone**). 
+
+* **Películas:** Detecta el título y el año, buscando automáticamente el póster oficial en **The Movie Database (TMDB)**.
+* **Series de Televisión / Anime:** Identifica patrones de nomenclatura estándar como `S01E02` o `1x02`. Al detectarlos, extrae el título de la serie para buscar su carátula global, añade un icono de televisión (`📺`) y formatea limpiamente el estado en Discord mostrando la **Temporada** y el **Episodio** junto a la barra de progreso. ¡Perfecto para tener tu perfil organizado sin importar lo alterados que estén los metadatos de tus archivos!
+
+Bro, simplemente es brutal poder lucir la carátula real de lo que estás viendo aunque el archivo sea **p1r4t4**; el mod omite de forma inteligente todos los elementos basura como puntos, enlaces o etiquetas de códecs y hace el resto por ti.
 
 ---
 
 ## 🛠️ DEPENDENCIAS:
 
 ### Python 3 (Requisito previo):
-* **🍏 macOS:** `brew install python` o descargar desde la [Web Oficial](https://www.python.org/downloads/mac-osx/)
+* **🍏 macOS:** `brew install python` o descarga desde la [Web Oficial](https://www.python.org/downloads/mac-osx/)
 * **🐧 Linux (Arch / CachyOS):** `sudo pacman -S python`
 * **🐧 Linux (Ubuntu / Debian):** `sudo apt update && sudo apt install python3 python3-pip`
-* **🪟 Windows:** Descargar desde la [Web Oficial](https://www.python.org/downloads/windows/) *(⚠️ Es crítico marcar la casilla "Add Python to PATH" al instalar)*
+* **🪟 Windows:** Descarga desde la [Web Oficial](https://www.python.org/downloads/windows/) *(⚠️ Es crítico marcar la casilla "Add Python to PATH" al instalar)*
 
-### Instalación automática con el programa:
-* **— pypresence —** Permite la comunicación interna con tu cuenta de Discord.
-* **— requests —** Se conecta con la API de TMDB para buscar y descargar las carátulas.
-
----
-
-## ✨ Características
-
-* **Soporte Multiplataforma Real**: Adaptado a las particularidades de sockets y tuberías de comunicación de cada sistema operativo (Sockets UNIX en macOS/Linux y Pipes Nombrados en Windows).
-* **Limpieza por Regex Avanzada**: Purga automáticamente del título etiquetas de resolución, códecs y ripeos (`1080p`, `x265`, `Bluray`, corchetes, paréntesis) antes de buscar metadatos.
-* **Integración Nativa con TMDB**: Localiza de manera inteligente carátulas y títulos oficiales con soporte bilingüe (Español/Inglés) en tiempo real.
-* **Instaladores Inteligentes**: Automatización del despliegue de dependencias (`pypresence`, `requests`) e inyección automática del intérprete de Python adecuado con un solo clic.
-* **Sincronización de Tiempo Precisa**: Mapeo en tiempo real del estado de pausa, tiempo transcurrido y duración total de la cinta.
+### Instalación automática con el asistente:
+* **— pypresence —** Permite la comunicación por IPC con tu cliente de Discord.
+* **— requests —** Se conecta de forma segura con la API de TMDB.
 
 ---
 
-## 📸 Ejemplos de Visualización
+## ✨ Características
 
-Así es como se ve tu perfil de Discord cuando el script está en funcionamiento. Al integrarse con TMDB, recupera dinámicamente los pósters oficiales en lugar de mostrar un icono genérico:
-
-### 🎬 En Reproducción
-Cuando estás viendo una película, muestra el título limpio, el año de lanzamiento, el estado actual y una barra de tiempo dinámica con el progreso exacto.
-
-![Ejemplo en Reproducción](assets/discord_playing.png)
-
-### ⏸️ En Pausa
-Si detienes momentáneamente la reproducción, el estado de tu Rich Presence se actualiza al instante reflejando que la cinta está pausada y congelando el temporizador.
-
-![Ejemplo en Pausa](assets/discord_paused.png)
+* **Botonera 100% Opcional y Modular:** Configura el diseño de tu Rich Presence desde el instalador. Activa o desactiva de forma independiente los botones de información o el de GitHub para cuidar la estética de tu perfil.
+* **Limpieza por Regex Avanzada:** Purga automáticamente del título etiquetas de resolución, códecs y ripeos (`1080p`, `x264`, `x265`, `Bluray`, corchetes, paréntesis) antes de realizar la consulta de metadatos.
+* **Soporte Bilingüe Automático:** Realiza búsquedas cruzadas en Español (es-ES) e Inglés (en-US) para asegurar que siempre se encuentre la ficha correcta.
+* **Sincronización de Tiempo:** Mapeo en tiempo real del estado de reproducción, pausa congelada, tiempo transcurrido (se actualiza cada 10s) y duración total de la cinta mediante barras visuales (`▬🔘▬`).
 
 ---
 
-## Ve a ver mi vídeo de YT!!
+## 📸 Ejemplos de Configuración Visual
 
-Aquí tienes un pequeño tutorial y demostración del funcionamiento (muy pequeño ya que no tiene mucho misterio):
+Gracias al nuevo sistema modular, puedes elegir exactamente cómo lucirá tu perfil en Discord según tus preferencias de espacio:
 
-[![Ver demostración de Savin-cinema-rpc](https://img.youtube.com/vi/TU_ID_DE_VIDEO/0.jpg)](https://www.youtube.com/watch?v=TU_ID_DE_VIDEO)
+### 1. Ficha de Información Completa (`Ver información`)
+Muestra los detalles del archivo junto con un botón interactivo llamado **"Ver información"** que redirige a la ficha oficial de la película o serie en la web de TMDb.
+
+![Configuración con Botón de Información](assets/discord_paused-no-github.png)
+
+### 2. Ficha de Desarrollador (`GitHub`)
+Ideal si quieres dar créditos al proyecto o enlazar tu propio repositorio de personalizaciones. Añade un botón directo hacia la plataforma de desarrollo.
+
+![Configuración con Botón de GitHub](assets/discord_paused-github.png)
+
+### 3. Perfil Ultra-Minimalista (Sin Botones)
+Para los amantes del minimalismo absoluto. Si desactivas ambos botones en el instalador, la presencia se envía limpia sin ocupar espacio vertical innecesario, dejando un diseño compacto en el miniperfil de Discord.
+
+![Configuración Sin Botones](assets/normal.png)
+
+---
+
+## 🎥 Videotutorial de Demostración
+
+Aquí tienes un pequeño tutorial y demostración del funcionamiento en tiempo real:
+
+[![Ver demostración de Savin-cinema-rpc](https://img.youtube.com/vi/TU_ID_DE_VIDEO/0.jpg)](https://www.youtube.com/watch?v=TU_ID_DE_VIDEO)
 
 ---
 
 ## 📂 Arquitectura y Rutas por Sistema
 
-El programa adapta su comportamiento e inyección de archivos según el entorno donde se ejecute:
+El programa adapta su comportamiento e inyección de archivos según el entorno donde se ejecute:
 
-| Sistema Operativo | Ruta del Script (`.py`) y Configuración | Ruta del Script de Lanzamiento (`.lua`) | Servidor IPC (`mpv.conf`) |
+| Sistema Operativo | Ruta del Script (`.py`) y Configuración | Ruta del Script de Lanzamiento (`.lua`) | Servidor IPC (`mpv.conf`) |
 | :--- | :--- | :--- | :--- |
 | **macOS** 🍏 | `~/.config/mpv/` | `~/.config/mpv/scripts/`<br>`~/Library/Application Support/mpv/scripts/` | `input-ipc-server=/tmp/mpvsocket` |
 | **Linux** 🐧 | `~/.config/mpv/` | `~/.config/mpv/scripts/` | `input-ipc-server=/tmp/mpvsocket` |
@@ -68,34 +76,22 @@ El programa adapta su comportamiento e inyección de archivos según el entorno 
 
 ---
 
-## 🚀 Guía de Instalación
+## 🚀 Guía de Instalación Interactiva
 
 ### 🍏 En macOS
-1. Descarga el archivo de instalación `Savin-cinema-rpc.command`.
-2. Haz **doble clic** sobre él en el Finder.
-3. Sigue las instrucciones interactivas en la terminal (puedes presionar `Enter` para usar el Client ID por defecto o introducir uno personalizado).
+1. Descarga el archivo de instalación `Savin-cinema-rpc.command`.
+2. Haz **doble clic** sobre él en el Finder.
+3. Sigue las instrucciones de la terminal. El asistente te preguntará uno a uno si deseas incluir el botón de información y el de GitHub. Presiona `Enter` para aceptar la opción por defecto (**Sí**) o introduce `n` para denegarla.
 
 > 💡 *Nota de macOS:* Si el sistema lo bloquea por seguridad la primera vez, haz clic derecho sobre el archivo y selecciona **Abrir**.
 
 ### 🐧 En Linux
-1. Asegúrate de dar permisos de ejecución al script instalador (`Savin-cinema-rpc.sh`):
+1. Da permisos de ejecución al script instalador (`Savin-cinema-rpc.sh`):
    ```bash
    chmod +x Savin-cinema-rpc.sh
-   ```
-2. Ejecútalo desde tu terminal:
-   ```bash
-   ./Savin-cinema-rpc.sh
-   ```
-3. El instalador detectará tu entorno de Python local e inyectará los scripts en tu estructura de `~/.config/mpv/`.
 
-### 🪟 En Windows
-1. Descarga y ejecuta el archivo por lotes `Savin-cinema-rpc.bat`.
-2. El script se encargará de comprobar que Python esté añadido al `PATH` del sistema, instalará las librerías necesarias mediante `pip` de forma silenciosa y generará tanto el disparador Lua como el demonio Python en tu directorio `%APPDATA%\mpv\`.
-
-> 💡 *Optimización para Windows:* El disparador Lua para Windows ejecuta el proceso en segundo plano utilizando `pythonw.exe` para evitar ventanas de comandos parpadeantes o molestas mientras disfrutas de la película.
-
----
+   ---
 
 ## ⚖️ Licencia
 
-Este proyecto está bajo la Licencia GNU v3. Consulta el archivo `LICENSE` para obtener más detalles.
+Este proyecto está bajo la Licencia GNU v3. Consulta el archivo `LICENSE` para obtener más detalles.
