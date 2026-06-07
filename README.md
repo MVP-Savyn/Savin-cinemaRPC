@@ -1,3 +1,10 @@
+### 📥 Descargas Obligatorias (Prerrequisitos)
+Antes de instalar este mod, asegúrate de tener instaladas las dos herramientas base en tu sistema:
+* 🎬 **[Descargar MPV Media Player](https://mpv.io/installation/)** (Reproductor compatible imprescindible)
+* 🐍 **[Descargar Python 3.x](https://www.python.org/downloads/)** (Necesario para ejecutar el núcleo del RPC)
+
+---
+
 # Savin-cinema-rpc 🎬
 
 Un mod multiplataforma y altamente personalizable que envía a Discord la información de lo que estás viendo en **local o streaming** utilizando **mpv**, incluyendo la carátula oficial del contenido y el minuto exacto de reproducción.
