@@ -187,7 +187,7 @@
         .carousel-item img {
             width: 100%;
             height: 100%;
-            object-fit: fill;
+            object-fit: cover; /* CORRECCIÓN: Cambiado de 'fill' a 'cover' para rellenar todo el espacio disponible sin deformar */
             pointer-events: none;
             display: none;
         }
@@ -563,7 +563,6 @@
 <body>
 
     <div class="container">
-        <!-- Header -->
         <header>
             <div class="profile-container">
                 <img class="profile-img" src="https://github.com/MVP-Savyn.png" alt="MVP-Savyn">
@@ -573,21 +572,17 @@
             <p class="tagline">El script de Rich Presence definitivo para MPV. Sincroniza tus reproducciones con carátulas oficiales de TMDb de forma automatizada y con un diseño modular impecable.</p>
         </header>
 
-        <!-- Descargas Directas -->
         <div class="cta-container">
             <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC/releases/latest" class="cta-btn">Descargar Última Release</a>
             <a href="https://www.python.org/downloads/" class="cta-btn python-btn" target="_blank">Descargar Python 3</a>
         </div>
 
-        <!-- RELEVO HORIZONTAL (ESTILO MENÚ BATOCERA ADAPTATIVO) -->
         <h2 class="section-title">Galería de Demostración</h2>
         <div class="carousel-wrapper" id="carouselWrapper">
             <div class="carousel-track" id="carouselTrack">
-                <!-- Generado dinámicamente -->
-            </div>
+                </div>
         </div>
 
-        <!-- PREVISUALIZACIÓN DE VIDEO YOUTUBE -->
         <div class="video-showcase">
             <div class="video-placeholder">
                 <div class="play-button">
@@ -600,7 +595,6 @@
             </div>
         </div>
 
-        <!-- SHOWCASE INTERACTIVO COMPLETO -->
         <h2 class="section-title">Previsualización Interactiva Completa</h2>
         <div class="showcase-section">
             <div class="showcase-layout">
@@ -626,13 +620,12 @@
                     </button>
                 </div>
 
-                <!-- Lado derecho: El Mock de Discord Definitivo (Sincronizado con Screenshot) -->
                 <div>
                     <div class="discord-mock">
                         <div class="discord-header">Jugando</div>
                         <div class="discord-activity">
                             <div class="image-assets">
-                                <img class="large-image" id="mock-poster" src="https://image.tmdb.org/t/p/w500/8g98Ur6Yf3089vF86Ogt4Vp06fB.jpg" alt="Carátula">
+                                <img class="large-image" id="mock-poster" src="assets/interestellar.png" alt="Carátula Interstellar">
                                 <div class="small-image-container">
                                     <svg viewBox="0 0 24 24">
                                         <polygon points="8,5 19,12 8,19"></polygon>
@@ -641,20 +634,18 @@
                             </div>
                             <div class="activity-details">
                                 <div class="details-title-app">CINEEE</div>
-                                <div class="details-title" id="mock-media-title">Animales fantásticos y dónde enc...</div>
+                                <div class="details-title" id="mock-media-title">Interstellar (2014)</div>
                                 
-                                <!-- BARRA DE LÍNEA DE TIEMPO REAL DISCORD -->
                                 <div class="discord-timeline-container">
                                     <div class="discord-timeline-bar">
                                         <div class="discord-timeline-fill"></div>
                                     </div>
                                     <div class="discord-timeline-labels">
                                         <span id="mock-time-start">00:38</span>
-                                        <span id="mock-time-end">02:12:52</span>
+                                        <span id="mock-time-end">02:49:00</span>
                                     </div>
                                 </div>
 
-                                <!-- Custom Status o Tiempo extra (como en captura) -->
                                 <div style="font-size: 0.82rem; color: #23a55a; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                                     <svg style="width:14px; height:14px; fill:#23a55a;" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
                                     <span>0:00</span>
@@ -662,14 +653,12 @@
                             </div>
                         </div>
                         <div class="discord-buttons" id="mock-buttons-container">
-                            <!-- Inyección vía JavaScript -->
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Características -->
         <div class="features-grid">
             <div class="features-card">
                 <h3>🐍 Requisito: Python 3</h3>
@@ -689,13 +678,11 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="site-footer">
             <p>© 2026 Savin-cinema-rpc. Creado por MVP-Savyn. Entorno de paridad absoluta multiplataforma.</p>
         </footer>
     </div>
 
-    <!-- SCRIPT DE CÁLCULO DE MÉTRICAS DINÁMICAS ELÁSTICAS -->
     <script>
         const totalImages = 7;
         const gap = 30;
@@ -868,8 +855,6 @@
         });
 
         /* --- LÓGICA DE CONTROL DE MODOS DEL MOCK DE DISCORD --- */
-        const onlinePosterFallback = "https://image.tmdb.org/t/p/w500/8g98Ur6Yf3089vF86Ogt4Vp06fB.jpg";
-
         function updateMock(mode) {
             const buttons = document.querySelectorAll('.selector-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
@@ -882,11 +867,11 @@
         
             if (mode === 'one_button') {
                 btnContainer.innerHTML = `
-                    <a href="https://www.themoviedb.org/movie/315635-fantastic-beasts-and-where-to-find-them" target="_blank" class="discord-btn">Ver información</a>
+                    <a href="https://www.themoviedb.org/movie/157336-interstellar" target="_blank" class="discord-btn">Ver información</a>
                 `;
             } else if (mode === 'two_buttons') {
                 btnContainer.innerHTML = `
-                    <a href="https://www.themoviedb.org/movie/315635-fantastic-beasts-and-where-to-find-them" target="_blank" class="discord-btn">Ver información</a>
+                    <a href="https://www.themoviedb.org/movie/157336-interstellar" target="_blank" class="discord-btn">Ver información</a>
                     <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC" target="_blank" class="discord-btn">Savin-CinemaRPC</a>
                 `;
             } else if (mode === 'minimalist') {
