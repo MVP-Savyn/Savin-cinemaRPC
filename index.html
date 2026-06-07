@@ -823,20 +823,20 @@
         function updateMock(mode) {
             const buttons = document.querySelectorAll('.selector-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
-            
+                
             if(mode === 'one_button') buttons[0].classList.add('active');
             if(mode === 'two_buttons') buttons[1].classList.add('active');
             if(mode === 'minimalist') buttons[2].classList.add('active');
-
+                
             const poster = document.getElementById('mock-poster');
             const btnContainer = document.getElementById('mock-buttons-container');
-
+                
             poster.src = "assets/interestellar.png";
             poster.onerror = function() {
                 this.onerror = null;
                 this.src = onlinePosterFallback; 
             };
-
+        
             if (mode === 'one_button') {
                 btnContainer.innerHTML = `
                     <a href="https://www.themoviedb.org/movie/157336-interstellar" target="_blank" class="discord-btn">Ver información</a>
@@ -844,13 +844,12 @@
             } else if (mode === 'two_buttons') {
                 btnContainer.innerHTML = `
                     <a href="https://www.themoviedb.org/movie/157336-interstellar" target="_blank" class="discord-btn">Ver información</a>
-                    <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC" target="_blank" class="discord-btn">Github</a>
+                    <a href="https://mvp-savyn.github.io/Savin-cinemaRPC/" target="_blank" class="discord-btn">Savin-CinemaRPC</a>
                 `;
             } else if (mode === 'minimalist') {
                 btnContainer.innerHTML = ""; 
             }
         }
-
         updateMock('one_button');
     </script>
 </body>
