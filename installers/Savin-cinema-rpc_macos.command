@@ -64,7 +64,6 @@ echo ""
 # 4. Selector Opcional del Botón Web (Landing Page)
 echo -e "${YELLOW}[4/8] 💻 Configuración del botón de la Landing Page...${NC}"
 echo -e "¿Deseas mostrar el botón personalizado hacia tu Web Oficial?"
-echo -e "Presiona ${GREEN}[ENTER]${NC} para Sí (Por defecto) o introduce ${RED}n${NC} para No:"
 read -p "❯ " USER_INPUT_GH
 
 if [[ "$USER_INPUT_GH" =~ ^[nN]$ ]];
@@ -143,36 +142,59 @@ def get_media_data(filename):
     clean_title, ep_info, media_type = parse_media_type(filename)
     if not clean_title: return filename, None, "mpv-icon", None
     
-    if media_type == "tv":
-        search_endpoint = "search/tv"
-        view_url_base = "tv"
-    else:
-        search_endpoint = "search/movie"
-        view_url_base = "movie"
-        
-    url_es = f"https://api.themoviedb.org/3/{search_endpoint}?api_key={TMDB_API_KEY}&query={requests.utils.quote(clean_title)}&language=es-ES"
-    url_en = f"https://api.themoviedb.org/3/{search_endpoint}?api_key={TMDB_API_KEY}&query={requests.utils.quote(clean_title)}&language=en-US"
+    # Comprobar si el título original limpio contiene números/dígitos flotantes
+    tiene_numeros = bool(re.search(r'\d+', clean_title))
     
-    for url in [url_es, url_en]:
-        try:
-            response = requests.get(url, timeout=4)
-            if response.status_code != 200: continue
-            results = response.json().get('results', [])
-            if results:
-                match = results[0]
-                titulo_real = match.get('name') if media_type == "tv" else match.get('title', clean_title)
-                
-                fecha = match.get('first_air_date') if media_type == "tv" else match.get('release_date', '')
-                fecha_year = fecha.split('-')[0] if fecha else ""
-                
-                titulo_final = f"{titulo_real} ({fecha_year})" if fecha_year else titulo_real
-                poster = f"https://image.tmdb.org/t/p/w500{match.get('poster_path')}" if match.get('poster_path') else "mpv-icon"
-                
-                movie_id = match.get('id')
-                tmdb_url = f"https://www.themoviedb.org/{view_url_base}/{movie_id}" if movie_id else None
-                
-                return titulo_final, ep_info, poster, tmdb_url
-        except: pass
+    # Lógica predictiva: Si tiene números, el primer objetivo prioritario SIEMPRE es "tv" (Series/Anime)
+    if tiene_numeros:
+        orden_categorias = ["tv", "movie"]
+    else:
+        orden_categorias = [media_type, "tv" if media_type == "movie" else "movie"]
+        
+    # Construcción secuencial de cadenas de búsqueda
+    estrategias_busqueda = []
+    
+    # Estrategia A: Título original completo (mantiene los números internos del archivo)
+    estrategias_busqueda.append(clean_title)
+    
+    # Estrategia B: Omitir números por completo del título (Fallback definitivo de alta compatibilidad)
+    titulo_sin_numeros = re.sub(r'\d+', ' ', clean_title)
+    titulo_sin_numeros = re.sub(r'\s+', ' ', titulo_sin_numeros).strip('. -_ ')
+    
+    if titulo_sin_numeros and titulo_sin_numeros != clean_title:
+        estrategias_busqueda.append(titulo_sin_numeros)
+        
+    # Ejecución de la búsqueda en cascada profunda condicional
+    for titulo_query in estrategias_busqueda:
+        for m_type in orden_categorias:
+            search_endpoint = "search/tv" if m_type == "tv" else "search/movie"
+            view_url_base = "tv" if m_type == "tv" else "movie"
+            
+            url_es = f"https://api.themoviedb.org/3/{search_endpoint}?api_key={TMDB_API_KEY}&query={requests.utils.quote(titulo_query)}&language=es-ES"
+            url_en = f"https://api.themoviedb.org/3/{search_endpoint}?api_key={TMDB_API_KEY}&query={requests.utils.quote(titulo_query)}&language=en-US"
+            
+            for url in [url_es, url_en]:
+                try:
+                    response = requests.get(url, timeout=4)
+                    if response.status_code != 200: continue
+                    results = response.json().get('results', [])
+                    if results:
+                        match = results[0]
+                        titulo_real = match.get('name') if m_type == "tv" else match.get('title', titulo_query)
+                        
+                        fecha = match.get('first_air_date') if m_type == "tv" else match.get('release_date', '')
+                        fecha_year = fecha.split('-')[0] if fecha else ""
+                        
+                        titulo_final = f"{titulo_real} ({fecha_year})" if fecha_year else titulo_real
+                        poster = f"https://image.tmdb.org/t/p/w500{match.get('poster_path')}" if match.get('poster_path') else "mpv-icon"
+                        
+                        movie_id = match.get('id')
+                        tmdb_url = f"https://www.themoviedb.org/{view_url_base}/{movie_id}" if movie_id else None
+                        
+                        return titulo_final, ep_info, poster, tmdb_url
+                except: pass
+
+    # Retorno en crudo si nada coincide en TMDb
     return clean_title, ep_info, "mpv-icon", None
 
 def send_mpv_command(cmd_name, *args):
@@ -214,9 +236,9 @@ def main():
         res = send_mpv_command("get_property", "filename")
         
         if res == "__SOCKET_DEAD__":
-            try:
-                RPC.clear()
-                RPC.close()
+            try: RPC.clear()
+            except: pass
+            try: RPC.close()
             except: pass
             sys.exit(0)
             
@@ -227,9 +249,9 @@ def main():
             duration = send_mpv_command("get_property", "duration")
             
             if "__SOCKET_DEAD__" in [paused, time_pos, duration]:
-                try:
-                    RPC.clear()
-                    RPC.close()
+                try: RPC.clear()
+                except: pass
+                try: RPC.close()
                 except: pass
                 sys.exit(0)
                 
@@ -268,18 +290,13 @@ def main():
             else:
                 payload["state"] = f"▶ {prefix_status}{time_status}"
             
-            # Construcción modular inteligente de botones
             buttons_list = []
-            
-            # Botón 1 opcional: TMDb Info (Renombrado a "Ver información")
             if INCLUDE_INFO and movie_url:
                 buttons_list.append({"label": "Ver información", "url": movie_url})
             
-            # Botón 2 opcional: Landing Page Oficial
             if INCLUDE_GITHUB:
                 buttons_list.append({"label": "Savin-CinemaRPC", "url": GITHUB_URL})
             
-            # Inyectar solo si se ha activado al menos un botón válido
             if buttons_list:
                 payload["buttons"] = buttons_list
             
@@ -302,7 +319,7 @@ def main():
                     
                     print("\033[H\033[J", end="")
                     print("=" * 75)
-                    print(" 🎬   MPV DISCORD RICH PRESENCE - CUSTOM BUTTON LAYOUT v3.3 🎬")
+                    print(" 🎬   MPV DISCORD RICH PRESENCE - PREDICTIVE FILTER v3.3 🎬")
                     print("=" * 75)
                     print(f" 🎥 Medio:          '{display_title}'")
                     if ep_info: print(f" 📺 Info Serie:      {ep_info}")
@@ -314,8 +331,9 @@ def main():
                     pass
         else:
             if last_state != 'idle':
+                try: RPC.clear()
+                except: pass
                 try:
-                    RPC.clear()
                     last_state = 'idle'
                     last_filename = ""
                     movie_url = None
@@ -332,7 +350,7 @@ PYEOF
 sed -i '' "s/SAVIN_DYNAMIC_CLIENT_ID/$FINAL_CLIENT_ID/g" "$HOME/.config/mpv/savin_cinema_rpc.py" 2>/dev/null ||
 sed -i "s/SAVIN_DYNAMIC_CLIENT_ID/$FINAL_CLIENT_ID/g" "$HOME/.config/mpv/savin_cinema_rpc.py"
 
-# Reemplazar flags de visibilidad condicional sin comillas (como Booleanos puros de Python)
+# Reemplazar flags de visibilidad condicional sin comillas
 sed -i '' "s/SAVIN_DYNAMIC_INCLUDE_INFO/$FINAL_INCLUDE_INFO/g" "$HOME/.config/mpv/savin_cinema_rpc.py" 2>/dev/null ||
 sed -i "s/SAVIN_DYNAMIC_INCLUDE_INFO/$FINAL_INCLUDE_INFO/g" "$HOME/.config/mpv/savin_cinema_rpc.py"
 sed -i '' "s/SAVIN_DYNAMIC_INCLUDE_GITHUB/$FINAL_INCLUDE_GH/g" "$HOME/.config/mpv/savin_cinema_rpc.py" 2>/dev/null ||
