@@ -1,417 +1,899 @@
-[slides]
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Savin-cinema-rpc — El Mod Definitivo para MPV</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&family=Urbanist:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* 
-           DESIGN SYSTEM:
-           Dominant: #060709 (Deep Black)
-           Secondary: #0d1117 (Card Background)
-           Accent: #00ebd4 (Cyber Cyan) - Follows 60-30-10 rule
-        */
+        :root {
+            --bg-main: #060709;
+            --bg-card: #0d1117;
+            --bg-card-hover: #121821;
+            --accent: #00ebd4;
+            --accent-glow: rgba(0, 235, 212, 0.25);
+            --python-blue: #3776AB;
+            --python-blue-glow: rgba(55, 118, 171, 0.3); 
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --discord-dark: #232428;
+            --discord-profile: #111214;
+        }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
 
         body {
-            background-color: #060709;
-            display: grid;
-            gap: 20px;
-            grid-template-columns: 1fr;
-            margin: 0;
-            min-height: 100vh;
-            padding: 20px 0;
-            place-items: center;
-            color: #f3f4f6;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        .slide-container {
-            background-color: #060709;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Urbanist', sans-serif;
-            height: 720px;
-            width: 1280px;
-            justify-content: center;
-            overflow: hidden;
-            padding: 60px;
-            position: relative;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        .container {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
 
-        /* BACKGROUND DECORATION: Cyan Gradient Blobs & Shapes */
-        .slide-container::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 90% 10%, rgba(0, 235, 212, 0.05) 0%, transparent 40%),
-                        radial-gradient(circle at 10% 90%, rgba(0, 235, 212, 0.05) 0%, transparent 40%);
-            z-index: 0;
-        }
-
-        .slide-container > * { position: relative; z-index: 1; }
-
-        /* TYPOGRAPHY */
-        h1, h2, h3 { font-family: 'Poppins', sans-serif; font-weight: 700; color: #ffffff; margin: 0; }
-        p, li, th, td, span { font-family: 'Lato', sans-serif; font-size: 18px; color: #daffde; line-height: 1.5; }
-
-        .slide-title {
-            font-size: 44px;
-            color: #00ebd4;
+        /* Header & Perfil */
+        header {
+            text-align: center;
             margin-bottom: 40px;
-            text-align: left;
-            width: 100%;
+        }
+
+        .profile-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            box-shadow: 0 0 25px var(--accent-glow);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-img:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-name {
+            display: block;
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
+            margin-top: 10px;
         }
 
-        /* LAYOUTS */
-        .content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; }
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 50%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-        /* Title Slide Custom */
-        .profile-circle {
-            width: 160px; height: 160px;
-            border-radius: 50%;
-            border: 4px solid #00ebd4;
-            margin-bottom: 30px;
-            box-shadow: 0 0 30px rgba(0, 235, 212, 0.3);
-            object-fit: cover;
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 750px;
+            margin: 0 auto 30px auto;
+        }
+
+        /* Botones de Acción */
+        .cta-container {
+            text-align: center;
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
         .cta-btn {
-            background: #00ebd4; color: #060709;
-            padding: 12px 30px; border-radius: 50px;
-            text-decoration: none; font-weight: 700;
-            display: inline-block; margin-right: 15px;
-            transition: all 0.3s;
+            display: inline-block;
+            background: var(--accent);
+            color: #020406;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 1.15rem;
+            box-shadow: 0 5px 20px var(--accent-glow);
+            transition: all 0.3s ease;
         }
 
-        .cta-btn.python { background: #3776AB; color: white; }
-
-        /* Tiled Content (Gallery filling space) */
-        .tiled-content { display: flex; gap: 30px; width: 100%; height: 400px; }
-        .image-tile { flex: 1; position: relative; border-radius: 12px; overflow: hidden; border: 2px solid #1f2a3c; }
-        .image-tile img { width: 100%; height: 100%; object-fit: cover; } /* REQUERIMIENTO: Rellenar espacio */
-        .image-tile .tile-label { 
-            position: absolute; bottom: 0; width: 100%; 
-            background: rgba(0,0,0,0.7); padding: 10px; color: #00ebd4; font-weight: 700;
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+            background: #00ffea;
         }
 
-        /* Two Column Layout */
-        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; width: 100%; }
+        .cta-btn.python-btn {
+            background: linear-gradient(135deg, #3776AB, #2b5b84);
+            color: #ffffff;
+            box-shadow: 0 5px 20px var(--python-blue-glow);
+        }
 
-        /* Discord Mockup Styling */
-        .discord-mockup {
-            background: #111214; border-radius: 14px; padding: 24px;
-            width: 100%; max-width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        .cta-btn.python-btn:hover {
+            background: linear-gradient(135deg, #4b8bbe, #3776AB);
+            box-shadow: 0 8px 30px rgba(55, 118, 171, 0.5);
+        }
+
+        /* Títulos de Sección */
+        .section-title {
+            font-size: 1.8rem;
+            margin-top: 50px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        /* --- SISTEMA DE RELEVO HORIZONTAL ADAPTATIVO AVANZADO --- */
+        .carousel-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 40px;
+            overflow: hidden;
+            padding: 40px 0;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 30px;
+            padding: 15px 0;
+            overflow-x: hidden;
+            cursor: grab;
+            align-items: center;
+            width: 100%;
+            scrollbar-width: none;
+        }
+
+        .carousel-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-track:active {
+            cursor: grabbing;
+        }
+
+        .carousel-item {
+            flex: 0 0 320px;
+            height: 180px;
+            border-radius: 14px;
+            background: #101520;
+            border: 1px solid #1f2a3c;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s ease-out, filter 0.1s ease-out, opacity 0.1s ease-out;
+            will-change: transform, filter, opacity;
+            transform-origin: center center;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            pointer-events: none;
+            display: none;
+        }
+
+        .carousel-item .img-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(145deg, #0d121d, #182030);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .carousel-item .img-fallback span {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .carousel-item.center-active {
+            border-color: var(--accent);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 20px var(--accent-glow);
+            z-index: 5;
+        }
+
+        /* --- PREVISUALIZACIÓN DE YOUTUBE --- */
+        .video-showcase {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 70px auto;
+            background: #090d14;
+            border: 1px solid #1b2332;
+            border-radius: 20px;
+            padding: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+        }
+
+        .video-placeholder {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #05070a 0%, #111622 100%);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            border: 1px dashed #2c384e;
+            transition: border-color 0.3s ease;
+        }
+
+        .video-placeholder:hover {
+            border-color: var(--accent);
+        }
+
+        .play-button {
+            width: 70px;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.75);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px var(--accent-glow);
+            transition: all 0.3s ease;
+        }
+
+        .video-placeholder:hover .play-button {
+            transform: scale(1.1);
+            background: var(--accent);
+        }
+
+        .play-button svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--accent);
+            margin-left: 4px;
+        }
+
+        .video-placeholder:hover .play-button svg {
+            fill: #000;
+        }
+
+        .video-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .video-subtext {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        /* --- SHOWCASE INTERACTIVO --- */
+        .showcase-section {
+            background: #0a0d14;
+            border: 1px solid #19202e;
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 60px;
+        }
+
+        .showcase-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .showcase-layout {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 2.3rem; }
+            .cta-container { flex-direction: column; gap: 15px; }
+        }
+
+        .controls-box h3 {
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .selector-btn {
+            display: block;
+            width: 100%;
+            background: #121722;
+            border: 1px solid #20293a;
+            color: var(--text-muted);
+            padding: 16px 20px;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .selector-btn:hover {
+            background: #171e2c;
+            color: #fff;
+        }
+
+        .selector-btn.active {
+            background: rgba(0, 235, 212, 0.08);
+            border-color: var(--accent);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Simulador de Discord Nativo Real */
+        .discord-mock {
+            background: var(--discord-profile);
+            width: 100%;
+            max-width: 380px;
+            margin: 0 auto;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
             border: 1px solid #1e1f22;
         }
-        .discord-mock-header { font-size: 12px; color: #b5bac1; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; }
-        .discord-activity { display: flex; gap: 15px; }
-        .poster-wrapper { width: 95px; height: 135px; background: #1e1f22; border-radius: 6px; overflow: hidden; }
-        .poster-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-        .activity-info h4 { margin: 0; color: #3ba55d; text-transform: uppercase; font-size: 12px; }
-        .activity-title { font-weight: 700; font-size: 16px; margin-top: 4px; }
-        .activity-details { font-size: 14px; color: #dbdee1; }
-        .progress-bar { width: 100%; height: 4px; background: #4e5058; border-radius: 2px; margin: 10px 0; position: relative; }
-        .progress-fill { width: 35%; height: 100%; background: #ffffff; border-radius: 2px; }
-        .discord-btn { 
-            display: block; width: 100%; padding: 8px; background: #4e5058; color: #fff; 
-            text-align: center; border-radius: 4px; font-size: 14px; margin-top: 8px; font-weight: 500;
+
+        .discord-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #b5bac1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
         }
 
-        /* Highlight Numbers */
-        .number { color: #00ebd4; font-size: 140px; font-weight: 700; line-height: 1; }
-        .number-label { font-size: 28px; font-weight: 700; color: #ffffff; }
+        .discord-activity {
+            display: flex;
+            gap: 14px;
+        }
 
-        /* Tables */
-        .table-layout table { width: 100%; border-collapse: collapse; background: #0d1117; border-radius: 12px; overflow: hidden; }
-        .table-layout th { background: #00ebd4; color: #060709; padding: 20px; text-align: left; }
-        .table-layout td { padding: 20px; border-bottom: 1px solid #1f2a3c; }
+        .image-assets {
+            position: relative;
+            width: 95px;
+            height: 135px;
+            flex-shrink: 0;
+            border-radius: 6px;
+            background: #1e1f22;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
 
-        /* Timeline / Features with Icons */
-        .tile-icon { font-size: 50px; color: #00ebd4; margin-bottom: 20px; }
-        .feature-card { background: #0d1117; border-radius: 20px; padding: 40px; border: 1px solid #1f2a3c; text-align: center; }
+        .large-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+            display: block;
+        }
 
+        .small-image-container {
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #004d40;
+            border: 4px solid var(--discord-profile);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .small-image-container svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--accent);
+            margin-left: 2px;
+        }
+
+        .activity-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: top;
+            padding-top: 2px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .details-title-app {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #3ba55d;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .details-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #f2f3f5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .details-row {
+            font-size: 0.85rem;
+            color: #b5bac1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 3px;
+        }
+
+        /* BARRA DE PROGRESO DE DISCORD REAL */
+        .discord-timeline-container {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .discord-timeline-bar {
+            width: 100%;
+            height: 4px;
+            background: #4e5058;
+            border-radius: 2px;
+            position: relative;
+            margin: 8px 0;
+        }
+
+        .discord-timeline-fill {
+            height: 100%;
+            background: #ffffff;
+            width: 35%;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .discord-timeline-fill::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: -2px;
+            width: 8px;
+            height: 8px;
+            background: #ffffff;
+            border-radius: 50%;
+        }
+
+        .discord-timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: #b5bac1;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+
+        .discord-buttons {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .discord-btn {
+            background: #4e5058;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+            border: 1px solid transparent;
+        }
+
+        .discord-btn:hover {
+            background: #6d6f78;
+        }
+        
+        .discord-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Características inferiores */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            margin-bottom: 50px;
+        }
+
+        .features-card {
+            background: var(--bg-card);
+            border: 1px solid #161f2e;
+            padding: 25px;
+            border-radius: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .features-card:hover {
+            border-color: #20293a;
+        }
+
+        .features-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        footer.site-footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid #161f2e;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
 
-<div class="slide-container" id="slide1">
-    <div style="text-align: center;">
-        <img src="https://github.com/MVP-Savyn.png" class="profile-circle" alt="MVP-Savyn Profile">
-        <h1 style="font-size: 80px; letter-spacing: -2px;">MVP-Savyn</h1>
-        <h2 style="font-size: 40px; color: #00ebd4; font-weight: 400;">Savin-cinema-rpc</h2>
-        <p style="font-size: 22px; max-width: 800px; margin: 20px auto;">
-            La obra maestra de Rich Presence para mpv. Sincronización automática de carátulas TMDb con una estética cinemática impecable.
-        </p>
-    </div>
-</div>
-
-<div class="slide-container" id="slide2">
-    <div style="text-align: center;">
-        <hr style="width: 100px; border: 3px solid #00ebd4; margin-bottom: 30px;">
-        <h2 style="font-size: 70px;">La Visión</h2>
-        <p style="font-size: 24px;">Elevando la experiencia de mpv a estándares de streaming profesional.</p>
-    </div>
-</div>
-
-<div class="slide-container" id="slide3">
-    <h2 class="slide-title">El Problema vs La Solución</h2>
-    <div class="content-area">
-        <div class="two-column">
-            <div>
-                <h3 style="color: #00ebd4; margin-bottom: 20px;">Nombres de archivo caóticos</h3>
-                <p>La mayoría de scripts leen metadatos crudos de archivos como:</p>
-                <code style="background: #111; padding: 10px; border-radius: 6px; display: block; color: #ff5555; margin-bottom: 20px;">
-                    Interstellar.2014.1080p.BluRay.x265.10bit.HEVC.mkv
-                </code>
-                <p>Esto resulta en un estado de Discord desordenado y sin contexto visual.</p>
-                <h3 style="color: #00ebd4; margin-top: 30px; margin-bottom: 20px;">Ecosistema Savin-Cinema</h3>
-                <p>Implementamos un motor de limpieza inteligente que purga etiquetas innecesarias y consulta la API oficial de TMDb al instante.</p>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="profile-container">
+                <img class="profile-img" src="https://github.com/MVP-Savyn.png" alt="MVP-Savyn">
+                <span class="profile-name">MVP-Savyn</span>
             </div>
-            <div style="display: flex; justify-content: center; align-items: center;">
-                <div class="discord-mockup">
-                    <div class="discord-mock-header">Jugando</div>
-                    <div class="discord-activity">
-                        <div class="poster-wrapper">
-                            <img src="http://googleusercontent.com/image_collection/image_retrieval/14391503653807782853" alt="Interstellar Poster">
+            <h1>Savin-cinema-rpc</h1>
+            <p class="tagline">El script de Rich Presence definitivo para MPV. Sincroniza tus reproducciones con carátulas oficiales de TMDb de forma automatizada y con un diseño modular impecable.</p>
+        </header>
+
+        <!-- Descargas Directas -->
+        <div class="cta-container">
+            <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC/releases/latest" class="cta-btn">Descargar Última Release</a>
+            <a href="https://www.python.org/downloads/" class="cta-btn python-btn" target="_blank">Descargar Python 3</a>
+        </div>
+
+        <!-- RELEVO HORIZONTAL (ESTILO MENÚ BATOCERA ADAPTATIVO) -->
+        <h2 class="section-title">Galería de Demostración</h2>
+        <div class="carousel-wrapper" id="carouselWrapper">
+            <div class="carousel-track" id="carouselTrack">
+                <!-- Generado dinámicamente -->
+            </div>
+        </div>
+
+        <!-- PREVISUALIZACIÓN DE VIDEO YOUTUBE -->
+        <div class="video-showcase">
+            <div class="video-placeholder">
+                <div class="play-button">
+                    <svg viewBox="0 0 24 24">
+                        <polygon points="8,5 19,12 8,19"></polygon>
+                    </svg>
+                </div>
+                <div class="video-text">Video Demostrativo del Mod</div>
+                <div class="video-subtext">[Espacio reservado para tu review/guía de YouTube]</div>
+            </div>
+        </div>
+
+        <!-- SHOWCASE INTERACTIVO COMPLETO -->
+        <h2 class="section-title">Previsualización Interactiva Completa</h2>
+        <div class="showcase-section">
+            <div class="showcase-layout">
+                <div class="controls-box">
+                    <h3>Modos de Visualización</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.95rem;">
+                        Alterna entre las opciones estructurales avanzadas del mod. La barra de progreso integrada reproduce fielmente el diseño de las líneas de tiempo de actividad multimedia de Discord (fiel a tu configuración real):
+                    </p>
+                    
+                    <button class="selector-btn active" onclick="updateMock('one_button')">
+                        1. Un botón (Info o Github)
+                        <span style="display:block; font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Inyecta únicamente el botón de acceso configurado.</span>
+                    </button>
+                    
+                    <button class="selector-btn" onclick="updateMock('two_buttons')">
+                        2. Dos botones
+                        <span style="display:block; font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Combina el enlace multimedia de TMDb y el código fuente.</span>
+                    </button>
+
+                    <button class="selector-btn" onclick="updateMock('minimalist')">
+                        3. Minimalista
+                        <span style="display:block; font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Oculta la botonera inferior, optimizando el espacio visual de la tarjeta.</span>
+                    </button>
+                </div>
+
+                <!-- Lado derecho: El Mock de Discord Definitivo (Sincronizado con Screenshot) -->
+                <div>
+                    <div class="discord-mock">
+                        <div class="discord-header">Jugando</div>
+                        <div class="discord-activity">
+                            <div class="image-assets">
+                                <img class="large-image" id="mock-poster" src="https://image.tmdb.org/t/p/w500/8g98Ur6Yf3089vF86Ogt4Vp06fB.jpg" alt="Carátula">
+                                <div class="small-image-container">
+                                    <svg viewBox="0 0 24 24">
+                                        <polygon points="8,5 19,12 8,19"></polygon>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="activity-details">
+                                <div class="details-title-app">CINEEE</div>
+                                <div class="details-title" id="mock-media-title">Animales fantásticos y dónde enc...</div>
+                                
+                                <!-- BARRA DE LÍNEA DE TIEMPO REAL DISCORD -->
+                                <div class="discord-timeline-container">
+                                    <div class="discord-timeline-bar">
+                                        <div class="discord-timeline-fill"></div>
+                                    </div>
+                                    <div class="discord-timeline-labels">
+                                        <span id="mock-time-start">00:38</span>
+                                        <span id="mock-time-end">02:12:52</span>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Status o Tiempo extra (como en captura) -->
+                                <div style="font-size: 0.82rem; color: #23a55a; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+                                    <svg style="width:14px; height:14px; fill:#23a55a;" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                                    <span>0:00</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="activity-info">
-                            <h4>CINEEE</h4>
-                            <div class="activity-title">Interstellar (2014)</div>
-                            <div class="activity-details">🎬 Película • Ciencia Ficción</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill"></div>
-                            </div>
-                            <div style="font-size: 11px; color: #b5bac1; display: flex; justify-content: space-between;">
-                                <span>01:24:05</span>
-                                <span>02:49:00</span>
-                            </div>
-                            <div style="font-size: 11px; color: #23a55a; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                                <i class="fa-solid fa-gamepad"></i> <span>0:00</span>
-                            </div>
+                        <div class="discord-buttons" id="mock-buttons-container">
+                            <!-- Inyección vía JavaScript -->
                         </div>
                     </div>
-                    <div class="discord-btn">Ver información</div>
-                    <div class="discord-btn" style="background: #00ebd4; color: #000;">Savin-CinemaRPC</div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="slide-container" id="slide4">
-    <h2 class="slide-title">Características Core</h2>
-    <div class="content-area">
-        <div class="two-column" style="grid-template-columns: repeat(3, 1fr);">
-            <div class="feature-card">
-                <div class="tile-icon"><i class="fa-solid fa-broom"></i></div>
-                <h3>Regex Inteligente</h3>
-                <p>Limpieza profunda de títulos eliminando códecs, calidad y etiquetas de servidores remotos.</p>
+        <!-- Características -->
+        <div class="features-grid">
+            <div class="features-card">
+                <h3>🐍 Requisito: Python 3</h3>
+                <p>El núcleo del script se ejecuta sobre Python 3. El instalador oficial detecta tu entorno automáticamente para asegurar la comunicación IPC.</p>
             </div>
-            <div class="feature-card">
-                <div class="tile-icon"><i class="fa-solid fa-globe"></i></div>
-                <h3>TMDb Bilingüe</h3>
-                <p>Fallback inteligente entre Español e Inglés para garantizar carátulas oficiales en todo momento.</p>
+            <div class="features-card">
+                <h3>🧼 Regex Inteligente</h3>
+                <p>Purga de forma automatizada etiquetas molestas de ripeo o servidores remotos (1080p, x265, Bluray, dual) para búsquedas perfectas.</p>
             </div>
-            <div class="feature-card">
-                <div class="tile-icon"><i class="fa-solid fa-layer-group"></i></div>
-                <h3>Modularidad</h3>
-                <p>Configura tu perfil con 1 botón, 2 botones o un modo ultra-minimalista para puristas.</p>
+            <div class="features-card">
+                <h3>🌐 Fallback Bilingüe</h3>
+                <p>Consulta inteligentemente en Español e Inglés en TMDb. Si falta información en un idioma, se complementa al instante.</p>
+            </div>
+            <div class="features-card">
+                <h3>🍏 Multiplataforma Real</h3>
+                <p>Mismo rendimiento optimizado y asistentes automatizados integrados para entornos Linux, macOS y Windows.</p>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="slide-container" id="slide5">
-    <h2 class="slide-title">Galería de Demostración I</h2>
-    <div class="content-area">
-        <div class="tiled-content">
-            <div class="image-tile">
-                <img src="http://googleusercontent.com/image_collection/image_retrieval/16239062519160750394" alt="Demo 1">
-                <div class="tile-label">Detección de Anime Remoto</div>
-            </div>
-            <div class="image-tile">
-                <img src="http://googleusercontent.com/image_collection/image_retrieval/16694351596093362751" alt="Demo 2">
-                <div class="tile-label">Asistente de Configuración (.sh)</div>
-            </div>
-            <div class="image-tile">
-                <img src="http://googleusercontent.com/image_collection/image_retrieval/16359162529343306665" alt="Demo 3">
-                <div class="tile-label">Limpieza Regex en Tiempo Real</div>
-            </div>
-        </div>
+        <!-- Footer -->
+        <footer class="site-footer">
+            <p>© 2026 Savin-cinema-rpc. Creado por MVP-Savyn. Entorno de paridad absoluta multiplataforma.</p>
+        </footer>
     </div>
-</div>
 
-<div class="slide-container" id="slide6">
-    <h2 class="slide-title">Galería de Demostración II</h2>
-    <div class="content-area">
-        <div class="tiled-content">
-            <div class="image-tile">
-                <img src="http://googleusercontent.com/image_collection/image_retrieval/16239062519160750394" alt="Demo 4">
-                <div class="tile-label">Modo Minimalista Activo</div>
-            </div>
-            <div class="image-tile">
-                <img src="http://googleusercontent.com/image_collection/image_retrieval/16694351596093362751" alt="Demo 5">
-                <div class="tile-label">Soporte nativo Rclone</div>
-            </div>
-            <div class="image-tile">
-                <img src="http://googleusercontent.com/image_collection/image_retrieval/16359162529343306665" alt="Demo 6">
-                <div class="tile-label">Paridad en Terminal MacOS</div>
-            </div>
-        </div>
-    </div>
-</div>
+    <!-- SCRIPT DE CÁLCULO DE MÉTRICAS DINÁMICAS ELÁSTICAS -->
+    <script>
+        const totalImages = 7;
+        const gap = 30;
+        const track = document.getElementById('carouselTrack');
+        let singleSetWidth = 0;
 
-<div class="slide-container" id="slide7">
-    <h2 class="slide-title">Rendimiento y Alcance</h2>
-    <div class="content-area">
-        <div class="two-column highlight-numbers-layout" style="align-items: center;">
-            <div>
-                <div class="number">100%</div>
-                <div class="number-label">Precisión en Búsquedas</div>
-            </div>
-            <div>
-                <h3>Eficiencia sin compromisos</h3>
-                <p>Nuestro algoritmo garantiza que el poster sea el correcto el 100% de las veces gracias a la búsqueda cruzada multi-idioma.</p>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 10px;"><i class="fa-solid fa-check" style="color: #00ebd4;"></i> Latencia de actualización menor a 1s</li>
-                    <li style="margin-bottom: 10px;"><i class="fa-solid fa-check" style="color: #00ebd4;"></i> Compatible con Windows, Linux y MacOS</li>
-                    <li><i class="fa-solid fa-check" style="color: #00ebd4;"></i> Soporte total para series (Temporada/Episodio)</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+        function buildCarouselDOM() {
+            track.innerHTML = '';
+            for (let loop = 0; loop < 3; loop++) {
+                for (let i = 1; i <= totalImages; i++) {
+                    const item = document.createElement('div');
+                    item.className = 'carousel-item';
 
-<div class="slide-container" id="slide8">
-    <h2 class="slide-title">Comparativa de Mercado</h2>
-    <div class="content-area">
-        <div class="table-layout">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Característica</th>
-                        <th>RPC Estándar</th>
-                        <th>Savin-cinema-rpc</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Limpieza de Título (Regex)</td>
-                        <td style="color: #ff5555;">Básico o Nulo</td>
-                        <td style="color: #00ebd4;">Avanzado / Personalizado</td>
-                    </tr>
-                    <tr>
-                        <td>Carátulas Oficiales (TMDb)</td>
-                        <td style="color: #ff5555;">No</td>
-                        <td style="color: #00ebd4;">Sí (Dinámico)</td>
-                    </tr>
-                    <tr>
-                        <td>UI Modular (Botones)</td>
-                        <td style="color: #ff5555;">Fijo</td>
-                        <td style="color: #00ebd4;">3 Modos Estructurales</td>
-                    </tr>
-                    <tr>
-                        <td>Soporte Multiplataforma</td>
-                        <td>Limitado</td>
-                        <td style="color: #00ebd4;">Total (IPC nativo)</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                    const img = document.createElement('img');
+                    img.src = `assets/demo${i}.png`;
+                    img.alt = `Demostración ${i}`;
+                    
+                    const fallback = document.createElement('div');
+                    fallback.className = 'img-fallback';
+                    fallback.innerHTML = `<span>assets/demo${i}.png</span>Muestra de Rich Presence`;
 
-<div class="slide-container" id="slide9">
-    <div style="text-align: center;">
-        <div class="tile-icon" style="font-size: 100px; color: #3776AB;"><i class="fa-brands fa-python"></i></div>
-        <h2 style="font-size: 60px;">Requisito: Python 3</h2>
-        <p style="font-size: 24px; max-width: 800px; margin: 0 auto;">
-            El núcleo del script se ejecuta sobre Python 3 para asegurar la comunicación IPC estable con mpv.
-        </p>
-    </div>
-</div>
+                    img.onload = function() {
+                        this.style.display = 'block';
+                        fallback.style.display = 'none';
+                        updateCarouselMetrics();
+                    };
 
-<div class="slide-container" id="slide10">
-    <h2 class="slide-title">Proceso de Instalación</h2>
-    <div class="content-area">
-        <div class="two-column" style="grid-template-columns: repeat(4, 1fr); gap: 20px;">
-            <div class="feature-card" style="padding: 20px;">
-                <h3 style="color: #00ebd4;">1</h3>
-                <p>Descarga el instalador (.sh / .command / .bat)</p>
-            </div>
-            <div class="feature-card" style="padding: 20px;">
-                <h3 style="color: #00ebd4;">2</h3>
-                <p>Ejecuta el script de automatización</p>
-            </div>
-            <div class="feature-card" style="padding: 20px;">
-                <h3 style="color: #00ebd4;">3</h3>
-                <p>Configura tus botones preferidos</p>
-            </div>
-            <div class="feature-card" style="padding: 20px;">
-                <h3 style="color: #00ebd4;">4</h3>
-                <p>Disfruta de una presencia premium</p>
-            </div>
-        </div>
-    </div>
-</div>
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                        fallback.style.display = 'flex';
+                        updateCarouselMetrics();
+                    };
 
-<div class="slide-container" id="slide11">
-    <h2 class="slide-title">Ecosistema Tecnológico</h2>
-    <div class="content-area">
-        <div class="two-column">
-            <div>
-                <h3>Integración Nativa</h3>
-                <p>Utilizamos <code>pypresence</code> y <code>requests</code> para una integración ligera que no consume recursos de CPU mientras reproduces contenido en 4K.</p>
-                <div style="margin-top: 40px; display: flex; gap: 20px;">
-                    <img src="http://googleusercontent.com/image_collection/image_retrieval/14912345704241673318" style="height: 60px;" alt="Python">
-                    <img src="http://googleusercontent.com/image_collection/image_retrieval/16487458422767945615" style="height: 60px;" alt="mpv">
-                    <img src="http://googleusercontent.com/image_collection/image_retrieval/17787678437835902348" style="height: 60px;" alt="Discord">
-                </div>
-            </div>
-            <div style="background: #0d1117; border-radius: 12px; padding: 30px; border: 1px solid #1f2a3c;">
-                <code style="color: #00ebd4; font-size: 14px; line-height: 1.2;">
-                    # Sincronización Automática<br>
-                    def update_mock(mode):<br>
-                    &nbsp;&nbsp;poster.src = "assets/interestellar.png"<br>
-                    &nbsp;&nbsp;title.text = "CINEEE"<br>
-                    &nbsp;&nbsp;movie.url = "https://www.themoviedb.org/"<br>
-                    &nbsp;&nbsp;landing.link = "mvp-savyn.github.io"<br>
-                </code>
-            </div>
-        </div>
-    </div>
-</div>
+                    item.appendChild(img);
+                    item.appendChild(fallback);
+                    track.appendChild(item);
+                }
+            }
+        }
 
-<div class="slide-container" id="slide12">
-    <div style="text-align: center;">
-        <h2 style="font-size: 60px; margin-bottom: 10px;">¡Comienza Hoy!</h2>
-        <p style="font-size: 24px; margin-bottom: 40px;">El mejor script de Discord RPC para mpv te está esperando.</p>
+        function updateCarouselMetrics() {
+            const items = document.querySelectorAll('.carousel-item');
+            let total = 0;
+            for (let i = 0; i < totalImages && i < items.length; i++) {
+                total += items[i].offsetWidth + gap;
+            }
+            singleSetWidth = total;
+        }
+
+        buildCarouselDOM();
+
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        function updateBatoceraAnimation() {
+            const trackRect = track.getBoundingClientRect();
+            const trackCenter = trackRect.left + (trackRect.width / 2);
+            const items = document.querySelectorAll('.carousel-item');
+            
+            items.forEach(item => {
+                const itemRect = item.getBoundingClientRect();
+                const itemCenter = itemRect.left + (itemRect.width / 2);
+                
+                const distanceFromCenter = Math.abs(trackCenter - itemCenter);
+                const maxInfluenceRadius = 380;
+                
+                let influenceRatio = 1 - Math.min(1, distanceFromCenter / maxInfluenceRadius);
+                influenceRatio = Math.pow(influenceRatio, 2);
+                
+                const scale = 0.86 + (0.26 * influenceRatio);       
+                const opacity = 0.45 + (0.55 * influenceRatio);    
+                const blur = 2.5 * (1 - influenceRatio);           
+                const grayscale = 60 * (1 - influenceRatio);       
+                
+                item.style.transform = `scale(${scale})`;
+                item.style.opacity = opacity;
+                item.style.filter = `blur(${blur}px) grayscale(${grayscale}%)`;
+                
+                if (distanceFromCenter < (item.offsetWidth / 2)) {
+                    item.classList.add('center-active');
+                } else {
+                    item.classList.remove('center-active');
+                }
+            });
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                updateCarouselMetrics();
+                track.scrollLeft = singleSetWidth;
+                updateBatoceraAnimation();
+            }, 100);
+        });
+
+        track.addEventListener('mousedown', (e) => {
+            isDown = true;
+            track.style.transition = 'none';
+            startX = e.pageX - track.offsetLeft;
+            scrollLeft = track.scrollLeft;
+        });
+
+        track.addEventListener('mouseleave', () => {
+            if (!isDown) return;
+            isDown = false;
+            snapToCenterSmooth();
+        });
+
+        track.addEventListener('mouseup', () => {
+            if (!isDown) return;
+            isDown = false;
+            snapToCenterSmooth();
+        });
+
+        track.addEventListener('mousemove', (e) => {
+            if(!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - track.offsetLeft;
+            const walk = (x - startX) * 1.5; 
+            track.scrollLeft = scrollLeft - walk;
+            handleInfiniteLoopBounds();
+            updateBatoceraAnimation();
+        });
+
+        track.addEventListener('touchstart', (e) => {
+            isDown = true;
+            startX = e.touches[0].pageX - track.offsetLeft;
+            scrollLeft = track.scrollLeft;
+        });
         
-        <div style="display: flex; justify-content: center; gap: 20px;">
-            <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC/releases/latest" class="cta-btn">
-                <i class="fa-brands fa-github"></i> Descargar Última Release
-            </a>
-            <a href="https://www.python.org/downloads/" class="cta-btn python">
-                <i class="fa-brands fa-python"></i> Descargar Python 3
-            </a>
-        </div>
+        track.addEventListener('touchend', () => {
+            isDown = false;
+            snapToCenterSmooth();
+        });
         
-        <div style="margin-top: 60px; color: #b5bac1;">
-            <p>Savin-CinemaRPC v3.3 | Creado por MVP-Savyn</p>
-            <p style="font-size: 14px;">Visita: <span style="color: #00ebd4;">mvp-savyn.github.io/Savin-cinemaRPC/</span></p>
-        </div>
-    </div>
-</div>
+        track.addEventListener('touchmove', (e) => {
+            if(!isDown) return;
+            const x = e.touches[0].pageX - track.offsetLeft;
+            const walk = (x - startX) * 1.5;
+            track.scrollLeft = scrollLeft - walk;
+            handleInfiniteLoopBounds();
+            updateBatoceraAnimation();
+        });
 
+        function handleInfiniteLoopBounds() {
+            if (singleSetWidth === 0) return;
+            if (track.scrollLeft >= singleSetWidth * 2) {
+                track.scrollLeft -= singleSetWidth;
+            } else if (track.scrollLeft <= 0) {
+                track.scrollLeft += singleSetWidth;
+            }
+        }
+
+        function snapToCenterSmooth() {
+            const activeItem = document.querySelector('.carousel-item.center-active');
+            if (activeItem) {
+                const trackCenter = track.offsetWidth / 2;
+                const itemCenter = activeItem.offsetLeft + (activeItem.offsetWidth / 2);
+                
+                track.scrollTo({
+                    left: itemCenter - trackCenter,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        track.addEventListener('scroll', () => {
+            handleInfiniteLoopBounds();
+            updateBatoceraAnimation();
+        });
+
+        /* --- LÓGICA DE CONTROL DE MODOS DEL MOCK DE DISCORD --- */
+        const onlinePosterFallback = "https://image.tmdb.org/t/p/w500/8g98Ur6Yf3089vF86Ogt4Vp06fB.jpg";
+
+        function updateMock(mode) {
+            const buttons = document.querySelectorAll('.selector-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+                
+            if(mode === 'one_button') buttons[0].classList.add('active');
+            if(mode === 'two_buttons') buttons[1].classList.add('active');
+            if(mode === 'minimalist') buttons[2].classList.add('active');
+                
+            const btnContainer = document.getElementById('mock-buttons-container');
+        
+            if (mode === 'one_button') {
+                btnContainer.innerHTML = `
+                    <a href="https://www.themoviedb.org/movie/315635-fantastic-beasts-and-where-to-find-them" target="_blank" class="discord-btn">Ver información</a>
+                `;
+            } else if (mode === 'two_buttons') {
+                btnContainer.innerHTML = `
+                    <a href="https://www.themoviedb.org/movie/315635-fantastic-beasts-and-where-to-find-them" target="_blank" class="discord-btn">Ver información</a>
+                    <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC" target="_blank" class="discord-btn">Savin-CinemaRPC</a>
+                `;
+            } else if (mode === 'minimalist') {
+                btnContainer.innerHTML = ""; 
+            }
+        }
+        updateMock('one_button');
+    </script>
 </body>
 </html>
-
