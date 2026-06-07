@@ -154,10 +154,9 @@
             cursor: grabbing;
         }
 
-        /* El contenedor ahora es flexible en anchura y mantiene un alto uniforme */
         .carousel-item {
-            flex: 0 0 auto;
-            height: 220px;
+            flex: 0 0 320px; /* Ancho fijo estándar para todas las capturas */
+            height: 180px;   /* Altura proporcional estándar (puedes subirlo a 220px si lo prefieres más alto) */
             border-radius: 14px;
             background: #101520;
             border: 1px solid #1f2a3c;
@@ -168,20 +167,18 @@
             transform-origin: center center;
         }
 
-        /* Ajuste dinámico inteligente de la imagen */
+        /* 2. Forzamos a la imagen a estirarse por completo para rellenar el recuadro */
         .carousel-item img {
+            width: 100%;
             height: 100%;
-            width: auto;
-            min-width: 180px;  /* Protege contra imágenes excesivamente verticales */
-            max-width: 400px;  /* Protege contra imágenes panorámicas extremas */
-            object-fit: cover; /* ¡ZOOM e interpolación si choca contra los límites establecidos! */
+            object-fit: fill; /* Estira o encoge la foto para encajar exactamente en los 320x180px */
             pointer-events: none;
-            display: none;     /* JS se encarga de cambiar a block al verificar la carga */
+            display: none;    /* El JS se encarga de pasar a block al confirmar la carga */
         }
 
-        /* Fallback elástico con tamaño base */
+        /* 3. El cuadro gris de fallback ahora ocupa el mismo espacio exacto */
         .carousel-item .img-fallback {
-            width: 320px;
+            width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
