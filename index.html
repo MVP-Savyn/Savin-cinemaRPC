@@ -98,6 +98,7 @@
             display: flex;
             gap: 15px;
             justify-content: center;
+            align-items: center; /* CORRECCIÓN: Evita que los botones de los lados se estiren verticalmente */
             flex-wrap: wrap; /* Si la pantalla es estrecha, se bajan solos sin romperse */
             margin-top: 25px;
         }
@@ -273,18 +274,6 @@
             margin-bottom: 15px;
             box-shadow: 0 0 15px var(--accent-glow);
             transition: all 0.3s ease;
-        }
-
-        .video-placeholder:hover .play-button {
-            transform: scale(1.1);
-            background: var(--accent);
-        }
-
-        .play-button svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--accent);
-            margin-left: 4px;
         }
 
         .video-placeholder:hover .play-button svg {
@@ -569,6 +558,85 @@
             color: var(--text-muted);
             font-size: 0.9rem;
         }
+
+        /* Cascada de botones escalonados para MPV Player */
+        .mpv-cascade-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .mpv-main-btn {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            text-align: center;
+        }
+
+        .mpv-sub-btn {
+            display: inline-block;
+            background-color: #1a1e27;
+            color: #64ffda;
+            border: 2px solid rgba(100, 255, 218, 0.6);
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            
+            /* MODIFICACIÓN: Posicionamiento absoluto oculto para que no altere los botones laterales */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mpv-linux-btn {
+            width: 85%;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 0 0 20px 20px;
+            top: 0; /* Empieza escondido arriba */
+            z-index: 2;
+        }
+
+        .mpv-macos-btn {
+            width: 70%;
+            padding: 8px 15px;
+            font-size: 0.88rem;
+            border-radius: 0 0 16px 16px;
+            top: 0; /* Empieza escondido arriba */
+            z-index: 1;
+            border-color: rgba(100, 255, 218, 0.4);
+        }
+
+        /* NUEVAS REGLAS HOVER: Despliegan la cascada flotante de manera escalonada */
+        .mpv-cascade-container:hover .mpv-sub-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mpv-cascade-container:hover .mpv-linux-btn {
+            top: 100%;
+            margin-top: -14px; /* Se solapa perfectamente debajo del principal */
+        }
+
+        .mpv-cascade-container:hover .mpv-macos-btn {
+            top: 100%;
+            margin-top: 22px; /* Se solapa perfectamente debajo de Linux */
+        }
+
+        /* Efectos Hover individuales al pasar el cursor sobre los subbotones desplegados */
+        .mpv-sub-btn:hover {
+            background-color: #232936;
+            color: #00ffea;
+            border-color: #00ffea;
+            box-shadow: 0 0 15px rgba(0, 235, 212, 0.4);
+            transform: translateX(-50%) translateY(2px);
+        }
+
     </style>
 </head>
 <body>
@@ -584,8 +652,14 @@
         </header>
 
         <div class="cta-container">
-            <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC/releases/latest" class="cta-btn">Descargar última versión</a>
-            <a href="https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260607/mpv-x86_64-20260607-git-71ebd08.7z" class="cta-btn mpv-btn" target="_blank" rel="noopener noreferrer">Descargar MPV Player</a>
+            <a href="https://github.com/MVP-Savyn/Savin-cinemaRPC/releases/latest" class="cta-btn" target="_blank" rel="noopener noreferrer">Descargar última versión</a>
+            
+            <div class="mpv-cascade-container">
+                <a href="https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260607/mpv-x86_64-20260607-git-71ebd08.7z" class="cta-btn mpv-btn mpv-main-btn">MPV Player para Windows</a>
+                <a href="https://mpv.io/installation/" class="mpv-sub-btn mpv-linux-btn" target="_blank" rel="noopener noreferrer">Para Linux</a>
+                <a href="https://mpv.io/installation/" class="mpv-sub-btn mpv-macos-btn" target="_blank" rel="noopener noreferrer">Para macOS</a>
+            </div>
+            
             <a href="https://www.python.org/downloads/" class="cta-btn python-btn" target="_blank" rel="noopener noreferrer">Descargar Python 3</a>
         </div>
 
